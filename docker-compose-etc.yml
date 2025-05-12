@@ -1,0 +1,44 @@
+services:
+  etc-redis:
+    container_name: redis-cache
+    restart: unless-stopped
+    image: redis:7.4.3-alpine3.21
+    ports:
+      - 6379:6379
+    command: ["redis-server", "--requirepass", "password"]
+    networks:
+      - todolist
+
+  etc-postgres-db:
+    container_name: pg-database
+    image: postgres
+    restart: unless-stopped
+    shm_size: 128mb
+    volumes:
+      - todolist-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: user
+    ports:
+      - 5432:5432
+    networks:
+      - todolist
+      
+  etc-adminer:
+    container_name: pg-adminer
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - 10001:8080
+    networks:
+      - todolist
+
+volumes:
+  todolist-data:
+    name: "todolist"
+
+networks:
+  todolist:
+    driver: bridge
+

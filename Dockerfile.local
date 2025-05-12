@@ -1,0 +1,9 @@
+FROM image:tag as build
+
+RUN build build
+
+FROM image:tag as prod
+
+COPY --from=build . .
+
+CMD ["executable", "param"]
