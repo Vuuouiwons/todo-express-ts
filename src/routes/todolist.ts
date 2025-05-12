@@ -2,6 +2,9 @@ const express = require('express');
 const todolistRouter = express.Router();
 
 import { handleGetAllTodolist, handleCreateTodolist, handleGetTodolist, handleUpdateTodolist, handleDeleteTodolist } from '../controllers/todolist'
+import { isAuthorized } from '../middlewares/authorization';
+
+todolistRouter.use(isAuthorized);
 
 todolistRouter.get('/', handleGetAllTodolist);
 todolistRouter.post('/', handleCreateTodolist);
