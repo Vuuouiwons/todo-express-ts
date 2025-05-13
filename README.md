@@ -1,13 +1,12 @@
-# ToDo List Template
-This repository provides a structured specification for a ToDo list backend, including all essential API endpoints, request/response formats, and authentication flow. The goal is to serve as a reference blueprint for implementing the same project across multiple backend frameworks.
+# ToDo List
 
-By standardizing the API design, input/output expectations, and behavior, this repo enables consistent comparisons and learning experiences across different technologies.
+![tech stack logos](./images/tech-stack.png)
 
 # Tech stack
 Describe the tech stack used to make this todo app.
-1. express
+1. ExpressJS
 2. typeORM
-3. pg
+3. postgresql
 4. typescript
 
 ## etc Tech stack
