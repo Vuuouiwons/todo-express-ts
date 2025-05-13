@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { addTodo, updateTodo, deleteTodo } from "../services/todo";
 import { addTodoSchema, updateTodoSchema } from "../dto/request/todo";
 import { parseResponse } from "../dto/response";
-import { updateTodolist } from "../services/todolist";
 
 const handleAddTodo = async (req: Request, res: Response) => {
     const result = addTodoSchema.safeParse(req.body);

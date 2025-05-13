@@ -3,7 +3,6 @@ import { AppDataSource } from "../database";
 import { Todolist } from "../database/entities/todolist";
 import { Todo } from "../database/entities/todo";
 import { InsertResult, UpdateResult, DeleteResult } from "typeorm";
-import { promises } from "dns";
 
 const todoRepository = AppDataSource.getRepository(Todo);
 

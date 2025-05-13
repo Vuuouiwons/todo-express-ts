@@ -1,4 +1,3 @@
-import { InsertResult } from "typeorm"
 import { addTodoByTodolistId, updateTodoById, deleteTodoById, getTodoById } from '../repository/todo'
 import { getTodolistById } from "../repository/todolist";
 import { UserInformation } from "../dto/request/user";
