@@ -21,9 +21,7 @@ const getAllTodolistByUsername = async (username: string): Promise<Todolist[] | 
         .where("user.username = :username", { username: username })
         .orderBy("todolist.id", "DESC")
         .getRawMany();
-
-    console.log(todolist);
-
+    
     if (!todolist) {
         return null;
     }

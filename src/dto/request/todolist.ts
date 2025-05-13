@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-const getAllTodolistSchema = z.object({
-    XUsername: z.string().max(24),
-});
-
 const createTodolistSchema = z.object({
-    title: z.string().max(32),
+    title: z.string().max(24),
 });
 
+const updateTodolistSchema = z.object({
+    title: z.string().max(24).optional(),
+    status: z.boolean().optional()
+})
 
-export { getAllTodolistSchema, createTodolistSchema }
+export { updateTodolistSchema, createTodolistSchema }

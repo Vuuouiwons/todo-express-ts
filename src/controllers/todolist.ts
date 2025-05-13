@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { parseResponse } from "../dto/response";
-import { createTodolistSchema } from "../dto/request/todolist";
+import { updateTodolistSchema, createTodolistSchema } from "../dto/request/todolist";
 import { getAllTodolist, getTodolist, updateTodolist, addTodolist, deleteTodolist } from "../services/todolist";
 
 const handleGetAllTodolist = async (req: Request, res: Response) => {
@@ -27,6 +27,7 @@ const handleCreateTodolist = async (req: Request, res: Response) => {
         res
             .status(422)
             .send(parseResponse(0, "TL", 422, 'invalid body', result.error.format()));
+        return;
     }
 
     const data = req.body;
@@ -47,9 +48,17 @@ const handleCreateTodolist = async (req: Request, res: Response) => {
 };
 
 const handleUpdateTodolist = async (req: Request, res: Response) => {
+    const result = updateTodolistSchema.safeParse(req.body);
+
+    if (!result.success) {
+        res
+            .status(422)
+            .send(parseResponse(0, "TL", 422, 'invalid body', result.error.format()));
+        return
+    }
+
     const todolistId = Number(req.params.listId);
     const todolistUpdateStatus = await updateTodolist(todolistId, req.body, res.locals.userInformation);
-
 
     if (todolistUpdateStatus === 'todolist does not exsist') {
         res
