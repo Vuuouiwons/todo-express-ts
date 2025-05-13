@@ -10,6 +10,9 @@ export class Todolist {
     @Column({ length: 24 })
     title!: string
 
+    @Column({ type: "boolean", default: () => "false" })
+    status!: boolean
+
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
     createdAt!: Date
 
@@ -17,7 +20,7 @@ export class Todolist {
     updatedAt!: Date
 
     @ManyToOne(type => User, user => user.todolist)
-    user!: User
+    user!: User | number
 
     @OneToMany(type => Todo, todo => todo.todolist)
     todo!: Todo

@@ -1,4 +1,3 @@
-import { promises } from "dns";
 import { AppDataSource } from "../database";
 import { User } from "../database/entities/user";
 

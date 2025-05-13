@@ -17,9 +17,9 @@
   "description": "This repository provides a structured specification for a ToDo list backend, including all essential API endpoints, request/response formats, and authentication flow. The goal is to serve as a reference blueprint for implementing the same project across multiple backend frameworks.",
   "main": "src/app.js",
   "scripts": {
-    "build": "rm -r ./build && tsc",
+    "build": "tsc",
     "test": "rm -r ./build && tsc && ./run-dev.ps",
-    "dev": "nodemon --delay 5",
+    "dev": "nodemon --delay 2",
     "migrate": "tsc && build/database/index.js"
   },
   "author": "",

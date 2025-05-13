@@ -24,7 +24,7 @@ services:
       - 5432:5432
     networks:
       - todolist
-      
+
   etc-adminer:
     container_name: pg-adminer
     image: adminer

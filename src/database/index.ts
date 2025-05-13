@@ -6,7 +6,7 @@ import { Todo } from "./entities/todo";
 
 export const AppDataSource: DataSource = new DataSource({
     type: "postgres",
-    host: "localhost",
+    host: `${process.env.DB_HOST}`,
     port: 5432,
     username: `${process.env.DB_USERNAME}`,
     password: `${process.env.DB_PASSWORD}`,
@@ -20,7 +20,7 @@ export const AppDataSource: DataSource = new DataSource({
 
 AppDataSource.initialize()
     .then(() => {
-        console.log("OK");
+        console.log("Database Initalization OK!");
     })
     .catch((error) => {
         console.log(error);

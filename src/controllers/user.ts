@@ -11,7 +11,7 @@ const handleRegister = async (req: Request, res: Response) => {
 
     if (!result.success) {
         return res
-            .status(400)
+            .status(422)
             .send(parseResponse(0, 'RE', 422, 'invalid body', result.error.format()));
     }
 
@@ -47,8 +47,6 @@ const handleLogin = async (req: Request, res: Response) => {
 
     const unauthenticatedMessage = "username or password doesn't exsist";
 
-    console.log(userInformation);
-
     if (userInformation.username === undefined) {
         res.status(401).send(parseResponse(0, 'LO', 401, unauthenticatedMessage, null));
     }
@@ -57,13 +55,13 @@ const handleLogin = async (req: Request, res: Response) => {
         res.status(401).send(parseResponse(0, 'LO', 401, unauthenticatedMessage, null));
     };
 
-    const jwtToken: string = generateJWTToken(username);
+    const jwtToken: string = generateJWTToken({ id: userInformation.id, username: userInformation.username });
 
     const payload = {
-        tokwn: jwtToken
+        token: jwtToken
     };
 
-    res.status(200).send(parseResponse(0, 'LO', 200, 'user authenticated', payload))
+    res.status(200).send(parseResponse(0, 'LO', 200, 'user authenticated', payload));
 }
 
 export { handleRegister, handleLogin }

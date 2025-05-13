@@ -1,9 +1,18 @@
-FROM image:tag as build
+FROM node:latest AS build
 
-RUN build build
+WORKDIR /app
 
-FROM image:tag as prod
+COPY . .
 
-COPY --from=build . .
+RUN npm i
 
-CMD ["executable", "param"]
+RUN npm run build
+
+FROM node:alpine3.21
+
+WORKDIR /app
+
+COPY --from=build /app/build .
+COPY --from=build /app/node_modules /app/node_modules
+
+CMD ["node", "app.js"]

@@ -8,13 +8,16 @@ import { userRouter } from './user';
 import { helloWorldRouter } from './helloWorld';
 import { todolistRouter } from './todolist';
 import { todoRouter } from './todo'
+import { fetchUserInformation, isAuthorized } from '../middlewares/authorization';
 
-router.use(cors());
-router.use(morgan('dev'));
-router.use(bodyParser.json());
+const parserMiddleware = [cors(), bodyParser.json(), morgan('dev')]
+
+router.use(parserMiddleware);
 
 router.use('/hello-world', helloWorldRouter);
 router.use('/', userRouter);
+
+router.use([isAuthorized, fetchUserInformation]);
 router.use('/todolists', todolistRouter);
 router.use('/todolists/:listId/todos', todoRouter);
 
