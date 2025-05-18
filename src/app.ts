@@ -6,7 +6,7 @@ const app = express();
 
 const PORT: string = process.env.PORT ?? '3000';
 
-import { router } from "./routes/main";
+import { router } from "./main.route";
 
 app.use(router);
 
