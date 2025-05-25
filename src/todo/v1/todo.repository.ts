@@ -50,7 +50,6 @@ const updateTodoById = async (todoId: string | number, status: boolean, message:
 const deleteTodoById = async (todoId: string | number, userId: string | number): Promise<DeleteResult> => {
     const todoDeleteStatus = todoRepository
         .createQueryBuilder('todo')
-        .leftJoinAndSelect('todolist.id', 'todolist')
         .leftJoinAndSelect('todolist.user', 'user')
         .delete()
         .from(Todo)

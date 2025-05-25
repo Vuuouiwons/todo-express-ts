@@ -19,5 +19,5 @@ export class User {
     updatedAt!: Date
 
     @OneToMany(type => Todolist, todolist => todolist.user)
-    todolist!: Todolist[]
+    todolist!: Todolist[] | number
 }

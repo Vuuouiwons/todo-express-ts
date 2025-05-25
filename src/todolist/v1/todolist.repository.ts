@@ -55,7 +55,7 @@ const addTodolistByUsername = async (username: string, data: any): Promise<Inser
     return todolist;
 }
 
-const getTodolistById = async (id: number): Promise<Todolist> => {
+const getTodolistById = async (id: string | number, userId: string | number): Promise<Todolist> => {
     const todolist = await todolistRepository
         .createQueryBuilder('todolist')
         .leftJoinAndSelect("todolist.user", "user")
@@ -64,54 +64,65 @@ const getTodolistById = async (id: number): Promise<Todolist> => {
         .addSelect("todolist.status", "status")
         .addSelect('user.id', 'user')
         .where('todolist.id = :id', { id })
+        .andWhere('todolist.userId = :userId', { userId })
         .getRawOne();
 
     return todolist;
 }
 
-const getTodoByTodolistId = async (id: number): Promise<Todo[]> => {
+const getTodoByTodolistId = async (id: string | number, userId: string | number): Promise<Todo[]> => {
     const todo = await todoRepository
         .createQueryBuilder('todo')
+        .leftJoinAndSelect('todo.todolist', 'todolist')
+        .leftJoinAndSelect('todolist.user', 'user')
         .select('todo.status', 'status')
         .addSelect('todo.message', 'message')
         .addSelect('todo.id', 'id')
         .where("todo.todolistId = :id", { id })
+        .andWhere('user.id = :userId', { userId })
         .getRawMany()
 
     return todo
 }
 
-const updateTodolistStatusById = async (id: number, title: string, status: boolean): Promise<UpdateResult> => {
+const updateTodolistStatusById = async (id: string | number, userId: string | number, title: string, status: boolean): Promise<UpdateResult> => {
     const todolist = await todolistRepository
         .createQueryBuilder('todolist')
+        .leftJoinAndSelect('todolist.user', 'user')
         .update(Todolist)
         .set({
             title: title,
             status: status
         })
         .where('todolist.id = :id', { id })
+        .andWhere('user.id = :userId', { userId })
         .execute();
 
     return todolist;
 }
 
-const deleteTodolistById = async (id: number): Promise<DeleteResult | null> => {
+const deleteTodolistById = async (id: string | number, userId: string | number): Promise<DeleteResult | null> => {
     const todolist = await todolistRepository
         .createQueryBuilder('todolist')
+        .leftJoinAndSelect('todolist.user', 'user')
         .delete()
         .from(Todolist)
         .where('todolist.id = :id', { id: id })
+        .andWhere('user.id = :userId', { userId })
         .execute();
 
     return todolist;
 }
 
-const deleteTodoByTodolistId = async (id: number): Promise<DeleteResult | null> => {
+const deleteTodoByTodolistId = async (id: string | number, userId: string | number): Promise<DeleteResult | null> => {
     const todo = await todoRepository
         .createQueryBuilder('todo')
+        .leftJoinAndSelect('todo.todolist', 'todolist')
+        .leftJoinAndSelect('todolist.user', 'user')
         .delete()
         .from(Todo)
         .where('todolist.id = :id', { id: id })
+        .andWhere('user.id = :userId', { userId })
         .execute()
 
     return todo

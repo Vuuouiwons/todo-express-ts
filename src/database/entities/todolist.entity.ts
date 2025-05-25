@@ -23,5 +23,5 @@ export class Todolist {
     user!: User | number
 
     @OneToMany(type => Todo, todo => todo.todolist)
-    todo!: Todo
+    todo!: Todo | number
 }
