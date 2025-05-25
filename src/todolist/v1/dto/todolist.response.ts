@@ -8,4 +8,17 @@ interface GetAllTodolistI {
     todolist: TodolistI[]
 }
 
-export { TodolistI, GetAllTodolistI }
+interface TodoData {
+    id: number,
+    message: string
+}
+
+interface TodolistData {
+    id: number,
+    title: string,
+    status: boolean,
+    todo: TodoData[]
+}
+
+
+export { TodolistI, GetAllTodolistI, TodoData, TodolistData }
