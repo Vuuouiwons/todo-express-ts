@@ -2,84 +2,32 @@ import { addTodoByTodolistId, updateTodoById, deleteTodoById, getTodoById } from
 import { getTodolistById } from "../../todolist/v1/todolist.repository";
 import { UserInformation } from "../../user/v1/dto/user.request";
 
-const addTodo = async (todolistId: number, message: string, userInformation: UserInformation): Promise<string> => {
-    const todolist = await getTodolistById(todolistId);
+const addTodo = async (todolistId: string | number, message: string, userInformation: UserInformation): Promise<void> => {
+    const todolist = await getTodolistById(todolistId, userInformation.id);
 
-    if (!todolist) {
-        return 'todolist does not exsist'
-    }
+    if (!todolist) throw new Error('todolist does not exist');
 
-    if (todolist.user !== userInformation.id) {
-        return 'unauthorized';
-    }
-
-    const addTodoStatus = await addTodoByTodolistId(message, todolist);
-
-    if (!addTodoStatus) {
-        return 'add todo failed';
-    }
-
-    return 'todo added';
+    await addTodoByTodolistId(message, todolist.id);
 }
 
-const updateTodo = async (listId: number, todoId: number, status: boolean, message: string, userInformation: UserInformation): Promise<string> => {
-    const todolist = await getTodolistById(listId);
+const updateTodo = async (listId: string | number, todoId: string | number, status: boolean, message: string, userInformation: UserInformation): Promise<void> => {
+    const todolist = await getTodolistById(listId, userInformation.id);
+    if (!todolist) throw new Error('todolist does not exist');
 
-    if (!todolist) {
-        return 'todolist does not exsist';
-    }
+    const todo = await getTodoById(todoId, userInformation.id);
+    if (!todo) throw new Error('todo does not exist');
 
-    if (todolist.user !== userInformation.id) {
-        return 'unauthorized';
-    }
-
-    const todo = await getTodoById(todoId);
-
-    if (!todo) {
-        return 'todo does not exsist';
-    }
-
-    if (todo.todolist !== listId) {
-        return 'unauthorized';
-    }
-
-    const updateTodoStatus = await updateTodoById(todoId, status, message);
-
-    if (!updateTodoStatus) {
-        return 'update failed';
-    }
-
-    return 'todo updated';
+    await updateTodoById(todoId, status, message);
 }
 
-const deleteTodo = async (listId: number, todoId: number, userInformation: UserInformation): Promise<string> => {
-    const todolist = await getTodolistById(listId);
+const deleteTodo = async (listId: string | number, todoId: string | number, userInformation: UserInformation): Promise<void> => {
+    const todolist = await getTodolistById(listId, userInformation.id);
+    if (!todolist) throw new Error('todolist does not exist');
 
-    if (!todolist) {
-        return 'todolist does not exsist';
-    }
+    const todo = await getTodoById(todoId, userInformation.id);
+    if (!todo) throw new Error('todo does not exist');
 
-    if (todolist.user !== userInformation.id) {
-        return 'unauthorized';
-    }
-
-    const todo = await getTodoById(todoId);
-
-    if (!todo) {
-        return 'todo does not exsist';
-    }
-
-    if (todo.todolist !== listId) {
-        return 'unauthorized';
-    }
-
-    const deleteTodoStatus = await deleteTodoById(todoId);
-
-    if (!deleteTodoStatus) {
-        return 'deletion failed';
-    }
-
-    return 'todo deleted';
+    await deleteTodoById(todoId, userInformation.id);
 }
 
 export { addTodo, updateTodo, deleteTodo }

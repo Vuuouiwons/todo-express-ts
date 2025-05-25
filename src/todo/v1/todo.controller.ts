@@ -1,120 +1,90 @@
 import { Request, Response } from "express";
 import { addTodo, updateTodo, deleteTodo } from "./todo.service";
 import { addTodoSchema, updateTodoSchema } from "./dto/todo.request";
-import { parseResponse } from "../../common/dto/response";
+import { parseResponse, parseError } from "../../common/dto/response";
 
 const handleAddTodo = async (req: Request, res: Response) => {
     const result = addTodoSchema.safeParse(req.body);
 
     if (!result.success) {
-        res
+        return res
             .status(422)
             .send(parseResponse(0, 'TO', 422, 'invalid body', result.error.format()));
-        return;
     };
 
     const { message } = req.body;
-    const listId = Number(req.params.listId);
+    const listId = req.params.listId;
 
-    const addTodoStatus = await addTodo(listId, message, res.locals.userInformation);
+    addTodo(listId, message, res.locals.userInformation)
+        .then(
+            payload => {
+                return res.status(201).send(parseResponse(0, 'TO', 201, '', payload));
+            })
+        .catch(e => {
+            if (e.message === 'todolist does not exist')
+                return res
+                    .status(400)
+                    .send(parseError(0, 'TO', 400, e.message));
 
-    if (addTodoStatus === 'todolist does not exsist') {
-        res
-            .status(400)
-            .send(parseResponse(0, "TO", 400, 'todolist does not exsist', null));
-        return;
-    }
-
-    if (addTodoStatus === 'unauthorized') {
-        res
-            .status(401)
-            .send(parseResponse(0, 'TO', 401, 'unauthorized', null));
-        return;
-    }
-
-    if (addTodoStatus === 'add todo failed') {
-        res
-            .status(500)
-            .send(parseResponse(0, 'TO', 500, 'failed adding todo', null));
-        return;
-    }
-
-    res
-        .status(201)
-        .send(parseResponse(0, 'TO', 201, 'added todo to todolist', null));
+            return res
+                .status(500)
+                .send(parseError(0, 'TO', 500, e.message));
+        });
 };
 
 const handleUpdateTodo = async (req: Request, res: Response) => {
     const result = updateTodoSchema.safeParse(req.body);
 
     if (!result.success) {
-        res
+        return res
             .status(422)
             .send(parseResponse(0, 'TO', 422, 'invalid body', result.error.format()));
-        return;
     };
 
-    const listId = Number(req.params.listId);
-    const todoId = Number(req.params.todoId);
-
+    const listId = req.params.listId;
+    const todoId = req.params.todoId;
     const { message, status } = req.body;
-    const updateTodoStatus = await updateTodo(listId, todoId, status, message, res.locals.userInformation);
 
+    updateTodo(listId, todoId, status, message, res.locals.userInformation)
+        .then(payload => {
+            return res
+                .status(201)
+                .send(parseResponse(0, 'TO', 201, '', payload));
+        })
+        .catch(e => {
+            console.log(e);
+            if (e.message === 'todolist does not exist' ||
+                e.message === 'todo does not exist')
+                return res
+                    .status(400)
+                    .send(parseError(0, 'TO', 400, e.message));
 
-    if (updateTodoStatus === 'todolist does not exsist') {
-        res
-            .status(400)
-            .send(parseResponse(0, "TO", 400, 'todolist does not exsist', null));
-        return;
-    }
+            return res
+                .status(500)
+                .send(parseError(0, 'TO', 500, e.message));
 
-    if (updateTodoStatus === 'unauthorized') {
-        res
-            .status(401)
-            .send(parseResponse(0, 'TO', 401, 'unauthorized', null));
-        return;
-    }
-
-    if (updateTodoStatus === 'update failed') {
-        res
-            .status(500)
-            .send(parseResponse(0, 'TO', 500, 'update todo failed', null));
-        return;
-    }
-
-    res
-        .status(201)
-        .send(parseResponse(0, 'TO', 201, 'todo updated', null));
+        });
 };
 
 const handleDeleteTodo = async (req: Request, res: Response) => {
-    const listId = Number(req.params.listId);
-    const todoId = Number(req.params.todoId);
+    const listId = req.params.listId;
+    const todoId = req.params.todoId;
 
-    const deleteTodoStatus = await deleteTodo(listId, todoId, res.locals.userInformation);
-
-    if (deleteTodoStatus === 'todolist does not exsist') {
-        res
-            .status(400)
-            .send(parseResponse(0, "TO", 400, 'todolist does not exsist', null));
-        return;
-    }
-
-    if (deleteTodoStatus === 'unauthorized') {
-        res
-            .status(401)
-            .send(parseResponse(0, 'TO', 401, 'unauthorized', null));
-        return;
-    }
-
-    if (deleteTodoStatus === 'deletion failed') {
-        res
-            .status(500)
-            .send(parseResponse(0, 'TO', 500, 'delete todo failed', null));
-        return;
-    }
-
-    res.status(204).send()
+    deleteTodo(listId, todoId, res.locals.userInformation)
+        .then(payload => {
+            return res.status(204).send();
+        })
+        .catch(e => {
+            if (e.message === 'todolist does not exist' ||
+                e.message === 'todo does not exist'
+            )
+                return res
+                    .status(400)
+                    .send(parseResponse(0, "TO", 400, 'todolist does not exist', null));
+            return res
+                .status(500)
+                .send(parseResponse(0, 'TO', 500, 'delete todo failed', null));
+        });
 };
 
 export { handleAddTodo, handleUpdateTodo, handleDeleteTodo }
