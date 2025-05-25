@@ -4,16 +4,12 @@ import { todolistMap } from "./mappings/todolist.map";
 import { todoMap } from "../../todo/v1/mappings/todo.map";
 import { addTodolistByUsername, getAllTodolistByUsername, getTodolistById, updateTodolistStatusById, deleteTodolistById, deleteTodoByTodolistId, getTodoByTodolistId } from "./todolist.repository";
 import { Todolist } from "../../database/entities/todolist.entity";
-import { TodoData, TodolistData } from './dto/todolist.response';
+import { TodolistData } from './dto/todolist.response';
 
-const getAllTodolist = async (username: string, userInformation: UserInformation): Promise<Todolist[] | null> => {
-    const todolists = await getAllTodolistByUsername(username);
+const getAllTodolist = async (username: string, userInformation: UserInformation, limit: number, offset: number): Promise<Todolist[] | null> => {
+    const todolists = await getAllTodolistByUsername(username, limit, offset);
 
     if (!todolists || todolists.length === 0) {
-        return null
-    }
-
-    if (todolists[0].user !== userInformation.id) {
         return null
     }
 
@@ -63,7 +59,7 @@ const deleteTodolist = async (id: string, userInformation: UserInformation): Pro
     return 'success';
 }
 
-const getTodolist = async (id: string, userInformation: UserInformation): Promise<TodolistData> => {
+const getTodolist = async (id: string, userInformation: UserInformation, limit: number, offset: number): Promise<TodolistData> => {
     const todolist = await getTodolistById(id, userInformation.id);
 
     if (!todolist) {
@@ -71,7 +67,7 @@ const getTodolist = async (id: string, userInformation: UserInformation): Promis
     }
 
     const mappedTodolist = todolistMap(todolist);
-    const todo = (await getTodoByTodolistId(id, userInformation.id)).map(todoMap);
+    const todo = (await getTodoByTodolistId(id, userInformation.id, limit, offset)).map(todoMap);
 
     const data = {
         ...mappedTodolist,

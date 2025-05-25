@@ -6,7 +6,10 @@ import { getAllTodolist, getTodolist, updateTodolist, addTodolist, deleteTodolis
 const handleGetAllTodolist = async (req: Request, res: Response) => {
     const username = res.locals.userInformation.username;
 
-    getAllTodolist(username, res.locals.userInformation)
+    const limit = Number(req.query.limit) || 20;
+    const offset = Number(req.query.offset) || 0;
+
+    getAllTodolist(username, res.locals.userInformation, limit, offset)
         .then(payload => {
             if (!payload)
                 return res
@@ -94,7 +97,11 @@ const handleDeleteTodolist = async (req: Request, res: Response) => {
 
 const handleGetTodolist = async (req: Request, res: Response) => {
     const todolistId = req.params.listId;
-    getTodolist(todolistId, res.locals.userInformation)
+
+    const limit = Number(req.query.limit) || 0;
+    const offset = Number(req.query.offset) || 0;
+
+    getTodolist(todolistId, res.locals.userInformation, limit, offset)
         .then(payload => {
             console.log(payload);
             res

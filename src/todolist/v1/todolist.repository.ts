@@ -10,17 +10,16 @@ import { findUserByUsername } from "../../user/v1/user.repository";
 const todoRepository = AppDataSource.getRepository(Todo);
 const todolistRepository = AppDataSource.getRepository(Todolist);
 
-const getAllTodolistByUsername = async (username: string): Promise<Todolist[] | null> => {
+const getAllTodolistByUsername = async (username: string, limit: number, offset: number): Promise<Todolist[] | null> => {
+    console.log("LIMIT:", limit, "OFFSET:", offset);
     const todolist = await todolistRepository
         .createQueryBuilder("todolist")
         .leftJoinAndSelect("todolist.user", "user")
-        .select("todolist.id", "id")
-        .addSelect("todolist.title", "title")
-        .addSelect("todolist.status", "status")
-        .addSelect("todolist.userId", "user")
         .where("user.username = :username", { username: username })
         .orderBy("todolist.id", "DESC")
-        .getRawMany();
+        .take(limit)
+        .skip(offset)
+        .getMany();
 
     if (!todolist) {
         return null;
@@ -70,17 +69,16 @@ const getTodolistById = async (id: string | number, userId: string | number): Pr
     return todolist;
 }
 
-const getTodoByTodolistId = async (id: string | number, userId: string | number): Promise<Todo[]> => {
+const getTodoByTodolistId = async (id: string | number, userId: string | number, limit: number, offset: number): Promise<Todo[]> => {
     const todo = await todoRepository
         .createQueryBuilder('todo')
         .leftJoinAndSelect('todo.todolist', 'todolist')
         .leftJoinAndSelect('todolist.user', 'user')
-        .select('todo.status', 'status')
-        .addSelect('todo.message', 'message')
-        .addSelect('todo.id', 'id')
         .where("todo.todolistId = :id", { id })
         .andWhere('user.id = :userId', { userId })
-        .getRawMany()
+        .skip(offset)
+        .take(limit)
+        .getMany()
 
     return todo
 }
@@ -107,7 +105,7 @@ const deleteTodolistById = async (id: string | number, userId: string | number):
         .leftJoinAndSelect('todolist.user', 'user')
         .delete()
         .from(Todolist)
-        .where('todolist.id = :id', { id: id })
+        .where('todolist.id = :id', { id })
         .andWhere('user.id = :userId', { userId })
         .execute();
 
@@ -121,7 +119,7 @@ const deleteTodoByTodolistId = async (id: string | number, userId: string | numb
         .leftJoinAndSelect('todolist.user', 'user')
         .delete()
         .from(Todo)
-        .where('todolist.id = :id', { id: id })
+        .where('todolist.id = :id', { id })
         .andWhere('user.id = :userId', { userId })
         .execute()
 
