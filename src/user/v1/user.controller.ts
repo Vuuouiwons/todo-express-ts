@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { parseResponse } from '../../common/dto/response/index';
+import { parseResponse, parseError } from '../../common/dto/response/index';
 import { isUsernameAvailable, addUser, getUserInformation } from "./user.service"
 import { registerSchema, loginSchema } from './dto/user.request';
 import { userMap } from './mappings/user.map';
@@ -18,18 +18,22 @@ const handleRegister = async (req: Request, res: Response) => {
     const { username, password } = req.body;
 
     if (!await isUsernameAvailable(username)) {
-        res.send(parseResponse(0, 'RE', 400, 'username not available', null));
-        return;
+        return res
+            .status(400)
+            .send(parseResponse(0, 'RE', 400, 'username not available', null));
     }
 
-    const insertionStatus = await addUser(username, password);
-
-    if (!insertionStatus) {
-        res.send(parseResponse(0, 'RE', 500, "something in database insertion went wrong", null));
-        return;
-    }
-
-    res.status(201).send(parseResponse(0, 'RE', 201, 'success', userMap(insertionStatus)));
+    addUser(username, password)
+        .then(payload => {
+            return res
+                .status(201)
+                .send(parseResponse(0, 'RE', 201, 'success', userMap(payload)));
+        })
+        .catch(e => {
+            return res
+                .status(500)
+                .send(parseError(0, 'RE', 500, "something in database insertion went wrong"));
+        });
 }
 
 const handleLogin = async (req: Request, res: Response) => {
@@ -45,23 +49,18 @@ const handleLogin = async (req: Request, res: Response) => {
 
     const userInformation = await getUserInformation(username);
 
-    const unauthenticatedMessage = "username or password doesn't exsist";
+    const unauthenticatedMessage = "username or password doesn't exist";
 
-    if (userInformation.username === undefined) {
+    if (userInformation.username === undefined ||
+        !bcrypt.compareSync(password, userInformation.password)) {
         res.status(401).send(parseResponse(0, 'LO', 401, unauthenticatedMessage, null));
     }
 
-    if (!bcrypt.compareSync(password, userInformation.password)) {
-        res.status(401).send(parseResponse(0, 'LO', 401, unauthenticatedMessage, null));
-    };
-
     const jwtToken: string = generateJWTToken({ id: userInformation.id, username: userInformation.username });
 
-    const payload = {
-        token: jwtToken
-    };
-
-    res.status(200).send(parseResponse(0, 'LO', 200, 'user authenticated', payload));
+    return res
+        .status(200)
+        .send(parseResponse(0, 'LO', 200, 'user authenticated', { token: jwtToken }));
 }
 
 export { handleRegister, handleLogin }
