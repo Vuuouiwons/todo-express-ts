@@ -8,4 +8,14 @@ const parseResponse = (node: number, controllerId: string, httpCode: number, mes
     return payload;
 }
 
-export { parseResponse }
+const parseError = (node: number, controllerId: string, httpCode: number, message: string) => {
+    const status: string = `${node}-${controllerId}-${httpCode}`
+    const payload: Object = {
+        status,
+        message,
+    }
+    return payload;
+}
+
+
+export { parseResponse, parseError }
