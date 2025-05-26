@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { parseResponse, parseError } from '../../common/dto/response/index';
 import { isUsernameAvailable, addUser, getUserInformation } from "./user.service"
 import { registerSchema, loginSchema } from './dto/user.request';
-import { userMap } from './mappings/user.map';
 import { generateJWTToken } from '../../common/helpers/auth';
 import bcrypt from "bcryptjs";
 
