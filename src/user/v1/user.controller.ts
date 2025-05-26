@@ -20,19 +20,19 @@ const handleRegister = async (req: Request, res: Response) => {
     if (!await isUsernameAvailable(username)) {
         return res
             .status(400)
-            .send(parseResponse(0, 'RE', 400, 'username not available', null));
+            .send(parseError(0, 'RE', 400, 'username not available'));
     }
 
     addUser(username, password)
         .then(payload => {
             return res
                 .status(201)
-                .send(parseResponse(0, 'RE', 201, 'success', userMap(payload)));
+                .send();
         })
         .catch(e => {
             return res
                 .status(500)
-                .send(parseError(0, 'RE', 500, "something in database insertion went wrong"));
+                .send(parseError(0, 'RE', 500, e.message));
         });
 }
 
@@ -42,7 +42,7 @@ const handleLogin = async (req: Request, res: Response) => {
     if (!result.success) {
         return res
             .status(422)
-            .send(parseResponse(0, 'RE', 422, 'invalid body', result.error.format()));
+            .send(parseResponse(0, 'LO', 422, 'invalid body', result.error.format()));
     }
 
     const { username, password } = req.body;
@@ -53,14 +53,16 @@ const handleLogin = async (req: Request, res: Response) => {
 
     if (userInformation.username === undefined ||
         !bcrypt.compareSync(password, userInformation.password)) {
-        res.status(401).send(parseResponse(0, 'LO', 401, unauthenticatedMessage, null));
+        res
+            .status(401)
+            .send(parseError(0, 'LO', 401, unauthenticatedMessage));
     }
 
     const jwtToken: string = generateJWTToken({ id: userInformation.id, username: userInformation.username });
 
     return res
-        .status(200)
-        .send(parseResponse(0, 'LO', 200, 'user authenticated', { token: jwtToken }));
+        .status(201)
+        .send(parseResponse(0, 'LO', 201, 'user authenticated', { token: jwtToken }));
 }
 
 export { handleRegister, handleLogin }

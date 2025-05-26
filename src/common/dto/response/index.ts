@@ -8,7 +8,7 @@ const parseResponse = (node: number, controllerId: string, httpCode: number, mes
     return payload;
 }
 
-const parseError = (node: number, controllerId: string, httpCode: number, message: string) => {
+const parseError = (node: number | string, controllerId: string, httpCode: number, message: string) => {
     const status: string = `${node}-${controllerId}-${httpCode}`
     const payload: Object = {
         status,

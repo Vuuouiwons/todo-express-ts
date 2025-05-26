@@ -41,7 +41,7 @@ const handleCreateTodolist = async (req: Request, res: Response) => {
         .then(payload => {
             return res
                 .status(201)
-                .send(parseResponse(0, "TL", 201, '', null));
+                .send();
         })
         .catch(e => {
             return res
@@ -109,10 +109,14 @@ const handleGetTodolist = async (req: Request, res: Response) => {
                 .send(parseResponse(0, 'TL', 200, '', payload));
         })
         .catch(e => {
+            if (e.message === 'todolist does not exist')
+                return res
+                    .status(400)
+                    .send(parseError(0, 'TL', 400, e.message));
+                    
             return res
-                .status(400)
-                .send(parseError(0, 'TL', 400, e.message));
-
+                .status(500)
+                .send(parseError(0, 'TL', 500, e.message));
         });
 };
 

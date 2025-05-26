@@ -80,10 +80,10 @@ const handleDeleteTodo = async (req: Request, res: Response) => {
             )
                 return res
                     .status(400)
-                    .send(parseResponse(0, "TO", 400, 'todolist does not exist', null));
+                    .send(parseError(0, "TO", 400, e.message));
             return res
                 .status(500)
-                .send(parseResponse(0, 'TO', 500, 'delete todo failed', null));
+                .send(parseError(0, 'TO', 500, e.message));
         });
 };
 
