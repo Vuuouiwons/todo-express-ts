@@ -1,18 +1,28 @@
-FROM node:latest AS build
+FROM node:lts-alpine3.22 AS build_js
 
-WORKDIR /app
+WORKDIR /usr/local/build
 
 COPY . .
 
-RUN npm i
+RUN npm install
 
 RUN npm run build
 
-FROM node:alpine3.21
+FROM node:lts-alpine3.22 AS build_depedency
 
-WORKDIR /app
+WORKDIR /usr/local/build
 
-COPY --from=build /app/build .
-COPY --from=build /app/node_modules /app/node_modules
+COPY . .
 
-CMD ["node", "app.js"]
+RUN npm install --only=production
+
+FROM node:lts-alpine3.22 AS prod
+
+WORKDIR /usr/local
+
+COPY --from=build_js /usr/local/build/build ./build
+COPY --from=build_depedency /usr/local/build/node_modules ./node_modules
+
+ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
+
+CMD [ "/usr/local/build/main.js" ]
