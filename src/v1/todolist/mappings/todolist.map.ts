@@ -1,4 +1,4 @@
-import { Todolist } from "../../../database/entities/todolist.entity";
+import { Todolist } from "../entity/todolist.entity";
 
 const todolistMap = (todolist: Todolist): any => {
     const id: number = todolist.id;

@@ -1,4 +1,4 @@
-import { User } from "../../database/entities/user.entity";
+import { User } from "./entity/user.entity";
 import { findUserByUsername, createUser } from "./user.repository";
 import bcrypt from "bcryptjs";
 

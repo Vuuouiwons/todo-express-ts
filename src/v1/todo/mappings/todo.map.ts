@@ -1,4 +1,4 @@
-import { Todo } from "../../../database/entities/todo.entity";
+import { Todo } from "../entity/todo.entity";
 
 interface TodoData {
     id: number,

@@ -1,6 +1,6 @@
 import { addTodoByTodolistId, updateTodoById, deleteTodoById, getTodoById } from './todo.repository'
-import { getTodolistById } from "../../todolist/v1/todolist.repository";
-import { UserInformation } from "../../user/v1/dto/user.request";
+import { getTodolistById } from "../todolist/todolist.repository";
+import { UserInformation } from "../user/dto/user.request";
 
 const addTodo = async (todolistId: string | number, message: string, userInformation: UserInformation): Promise<void> => {
     const todolist = await getTodolistById(todolistId, userInformation.id);

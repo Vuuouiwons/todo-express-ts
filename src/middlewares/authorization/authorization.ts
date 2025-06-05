@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { parseResponse } from "../../common/dto/response";
 import { JWTDecoded } from './interface/authorization'
-import { findUserByUsername } from "../../user/v1/user.repository";
+import { findUserByUsername } from "../../v1/user/user.repository";
 
 const jwt = require('jsonwebtoken');
 

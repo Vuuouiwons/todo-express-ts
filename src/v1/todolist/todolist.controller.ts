@@ -113,7 +113,7 @@ const handleGetTodolist = async (req: Request, res: Response) => {
                 return res
                     .status(400)
                     .send(parseError(0, 'TL', 400, e.message));
-                    
+
             return res
                 .status(500)
                 .send(parseError(0, 'TL', 500, e.message));

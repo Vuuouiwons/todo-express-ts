@@ -1,9 +1,9 @@
 
 import { AppDataSource } from "../../database";
-import { Todolist } from "../../database/entities/todolist.entity";
-import { Todo } from "../../database/entities/todo.entity";
+import { Todolist } from "../todolist/entity/todolist.entity";
+import { Todo } from "./entity/todo.entity";
 import { InsertResult, UpdateResult, DeleteResult } from "typeorm";
-import { UserInformation } from "../../user/v1/dto/user.request";
+import { UserInformation } from "../user/dto/user.request";
 
 const todoRepository = AppDataSource.getRepository(Todo);
 

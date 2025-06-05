@@ -1,9 +1,9 @@
 import { InsertResult } from "typeorm";
-import { UserInformation } from "../../user/v1/dto/user.request";
+import { UserInformation } from "../user/dto/user.request";
 import { todolistMap } from "./mappings/todolist.map";
-import { todoMap } from "../../todo/v1/mappings/todo.map";
+import { todoMap } from "../todo/mappings/todo.map";
 import { addTodolistByUsername, getAllTodolistByUsername, getTodolistById, updateTodolistStatusById, deleteTodolistById, deleteTodoByTodolistId, getTodoByTodolistId } from "./todolist.repository";
-import { Todolist } from "../../database/entities/todolist.entity";
+import { Todolist } from "./entity/todolist.entity";
 import { TodolistData } from './dto/todolist.response';
 
 const getAllTodolist = async (username: string, userInformation: UserInformation, limit: number, offset: number): Promise<Todolist[] | null> => {

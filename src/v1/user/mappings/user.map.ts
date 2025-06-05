@@ -1,4 +1,4 @@
-import { User } from "../../../database/entities/user.entity";
+import { User } from "../entity/user.entity";
 
 const userMap = (user: User) => {
     const username = user.username;

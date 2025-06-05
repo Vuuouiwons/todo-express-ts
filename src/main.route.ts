@@ -4,10 +4,10 @@ const router = express.Router();
 const morgan = require('morgan');
 const cors = require('cors')
 
-import { userRouter } from './user/v1/user.route';
+import { userRouter } from './v1/user/user.route';
 import { helloWorldRouter } from './hello/hello.route';
-import { todolistRouter } from './todolist/v1/todolist.route';
-import { todoRouter } from './todo/v1/todo.route'
+import { todolistRouter } from './v1/todolist/todolist.route';
+import { todoRouter } from './v1/todo/todo.route'
 import { fetchUserInformation, isAuthorized } from './middlewares/authorization/authorization';
 
 const parserMiddleware = [cors(), bodyParser.json(), morgan('dev')]
