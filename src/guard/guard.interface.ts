@@ -3,8 +3,6 @@ export interface GuardResponse {
 }
 
 export interface GuardPayload {
-    iat: string;
-    exp: string;
     token: string;
 }
 
