@@ -1,8 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const router = express.Router();
 const morgan = require('morgan');
 const cors = require('cors')
-
 
 import { userRouter } from './v1/user/user.route';
 import { helloWorldRouter } from './hello/hello.route';
@@ -11,7 +11,6 @@ import { todoRouter } from './v1/todo/todo.route'
 import { fetchUserInformation, isAuthorized } from './middlewares/authorization/authorization';
 
 const parserMiddleware = [cors(), bodyParser.json(), morgan('dev')]
-const router = express.Router();
 
 router.use(parserMiddleware);
 
