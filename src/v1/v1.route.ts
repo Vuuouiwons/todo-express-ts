@@ -1,7 +1,7 @@
 const express = require('express');
 const v1Router = express.Router({ mergeParams: true });
 
-import { todolistRouter } from './todolist/todolists.route';
+import { todolistRouter } from './todolist/todolist.route';
 import { todoRouter } from './todo/todo.route';
 import { authRouter } from './auth/auth.route';
 import { isAuthorized } from '../guard/jwt';
