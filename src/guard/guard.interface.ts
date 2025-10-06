@@ -7,5 +7,5 @@ export interface GuardPayload {
 }
 
 export interface IGuardService {
-    verify(payload: GuardPayload): GuardResponse | null;
+    verify(token: GuardPayload): GuardResponse | null;
 }
