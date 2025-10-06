@@ -1,4 +1,6 @@
 const express = require('express');
+import { handleRegister, handleLogin } from "./auth.controller";
+
 const authRouter = express.Router({ mergeParams: true });
 
 authRouter.use('/register', handleRegister);
