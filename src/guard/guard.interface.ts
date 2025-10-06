@@ -3,9 +3,11 @@ export interface GuardResponse {
 }
 
 export interface GuardPayload {
+    iat: string;
+    exp: string;
     token: string;
 }
 
 export interface IGuardService {
-    verify(credentials: GuardPayload): GuardResponse
+    verify(payload: GuardPayload): GuardResponse | null;
 }

@@ -11,7 +11,7 @@ v1Router.use('/auth', authRouter);
 
 // SECURED
 v1Router.use([isAuthorized]);
-v1Router.use('todolists', todolistRouter);
-v1Router.use('todo', todoRouter);
+v1Router.use('/todolists', todolistRouter);
+v1Router.use('/todolists/:todolistId/todos', todoRouter);
 
 export { v1Router };

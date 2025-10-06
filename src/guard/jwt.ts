@@ -2,15 +2,22 @@ import { IGuardService, GuardPayload, GuardResponse } from './guard.interface';
 const jwt = require('jsonwebtoken');
 
 export class JWTGuardService implements IGuardService {
-    public async verify(payload: GuardPayload): GuardResponse {
+    public verify(payload: GuardPayload): GuardResponse | null {
         const token = payload.token;
+        let userId: string;
 
-        jwt.verify(token, process.env.JWT_SECRET, { maxAge: process.env.JWT_AGE }, (err: any, decoded: JWTDecoded) => {
-        if (err) {
-            throw Error('token invalid');
-        };
+        jwt.verify(token,
+            process.env.JWT_SECRET,
+            { maxAge: process.env.JWT_AGE },
+            (err: any, decoded: any) => {
+                if (err) {
+                    throw new Error('token invalid');
+                };
+
+                userId = decoded.userId;
+                return { userId };
+            });
         
-        return
-    });
+        return null;
     }
 }

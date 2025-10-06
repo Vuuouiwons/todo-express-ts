@@ -1,5 +1,5 @@
 async function parseResponse(
-    controllerId: number,
+    controllerId: string,
     statusCode: number,
     message: string,
     data: any = null) {
