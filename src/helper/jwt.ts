@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-
-function generateJWT(userId: string): string {
+import { JWT_SECRET } from "../config/config";
+export function generateJWT(userId: string | number): string {
     const exp = {
         expiresIn: '1d'
     };
@@ -8,6 +8,6 @@ function generateJWT(userId: string): string {
         'user_id': userId
     };
 
-    const token: string = jwt.sign(data, process.env.JWT_SECRET, exp);
+    const token: string = jwt.sign(data, JWT_SECRET, exp);
     return token
 }

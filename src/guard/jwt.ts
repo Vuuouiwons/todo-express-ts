@@ -1,3 +1,4 @@
+import { JWT_SECRET } from '../config/config';
 import { IGuardService, GuardRequest, GuardResponse } from './guard.interface';
 const jwt = require('jsonwebtoken');
 
@@ -18,9 +19,9 @@ export class JWTGuardService implements IGuardService {
         const token = tokenParts[1];
 
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const decoded = jwt.verify(token, JWT_SECRET);
             const payload: GuardResponse = {
-                'userId': decoded.userId
+                'userId': decoded.user_id
             };
             return payload;
         } catch (e) {

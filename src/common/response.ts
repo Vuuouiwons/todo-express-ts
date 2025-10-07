@@ -1,7 +1,7 @@
-async function parseResponse(
+function parseResponse(
     controllerId: string,
     statusCode: number,
-    message: string,
+    message: string | null = null,
     data: any = null) {
     return {
         'status': `${controllerId}-${statusCode}`,
