@@ -18,6 +18,9 @@ export class Todo {
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
     updatedAt!: Date
 
-    @ManyToOne(type => Todolist, todolist => todolist.todo)
+    @ManyToOne(type => Todolist, todolist => todolist.todo, {
+        cascade: true,
+        onDelete: 'CASCADE'
+    })
     todolist!: Todolist
 }

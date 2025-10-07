@@ -22,9 +22,6 @@ export class Todolist {
     @ManyToOne(type => User, user => user.todolist)
     user!: User
 
-    @OneToMany(type => Todo, todo => todo.todolist, {
-        cascade: true,
-        onDelete: 'CASCADE'
-    })
+    @OneToMany(type => Todo, todo => todo.todolist)
     todo!: Todo[]
 }
