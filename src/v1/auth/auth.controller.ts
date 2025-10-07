@@ -2,9 +2,11 @@ import { Request, Response } from 'express';
 import { registerSchema, loginSchema } from './auth.validator';
 import { parseResponse } from '../../common/response';
 
-import { register, login } from './auth.service'
+import { AuthService, AuthServiceInterface } from './auth.service'
 import { UsernameExistsError, CredentialError } from '../../errors/400';
 import { DatabaseError } from '../../errors/500';
+
+const authService: AuthServiceInterface = new AuthService()
 
 const handleRegister = async (req: Request, res: Response) => {
     const result = registerSchema.safeParse(req.body);
@@ -18,7 +20,7 @@ const handleRegister = async (req: Request, res: Response) => {
     const { username, password } = result.data;
 
     try {
-        await register(username, password);
+        await authService.register(username, password);
         return res
             .status(201)
             .send(parseResponse('RE', 201));
@@ -46,7 +48,7 @@ const handleLogin = async (req: Request, res: Response) => {
     const { username, password } = result.data;
 
     try {
-        const token = await login(username, password);
+        const token = await authService.login(username, password);
 
         return res.status(200).send(parseResponse('RE', 200, null, { token }));
     } catch (e) {

@@ -1,48 +1,62 @@
 import bcrypt from "bcryptjs";
 
-import { findUserByUsername, createUser } from '../../database/repository/user.repo';
+import { } from '../../database/repository/user.repo';
 import { User } from '../../database/models/user.model';
 import { UsernameExistsError, UsernameDoesNotExistsError, CredentialError } from "../../errors/400";
 import { DatabaseError } from "../../errors/500";
 import { generateJWT } from '../../helper/jwt';
+import { UserRepo, UserRepoInterface } from "../../database/repository/user.repo";
 
-export async function register(username: string, password: string): Promise<null> {
-    const user: User | null = await findUserByUsername(username);
-
-    if (user != null) {
-        throw new UsernameExistsError('username exist');
-    }
-
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    const userData = {
-        username,
-        'password': hashedPassword
-    }
-
-    try {
-        await createUser(userData);
-    } catch (error) {
-        throw new DatabaseError('something went wrong while writing to database');
-    }
-
-    return null;
+export interface AuthServiceInterface {
+    register(username: string, password: string): Promise<null>
+    login(username: string, password: string): Promise<string>
 }
 
-export async function login(username: string, password: string): Promise<string> {
-    const user: User | null = await findUserByUsername(username);
+export class AuthService implements AuthServiceInterface {
+    private userRepo: UserRepoInterface
 
-    if (user == null) {
-        throw new CredentialError('username or password invalid');
+    constructor(userRepoInject: UserRepo | null = null) {
+        this.userRepo = userRepoInject ? userRepoInject : new UserRepo()
     }
 
-    const hashedPassword: string = user.password;
+    public async register(username: string, password: string): Promise<null> {
+        const user: User | null = await this.userRepo.findUserByUsername(username);
 
-    if (!bcrypt.compareSync(password, hashedPassword)) {
-        throw new CredentialError('username or password invalid');
+        if (user != null) {
+            throw new UsernameExistsError('username exist');
+        }
+
+        const hashedPassword = bcrypt.hashSync(password, 10);
+        const userData = {
+            username,
+            'password': hashedPassword
+        }
+
+        try {
+            await this.userRepo.createUser(userData);
+        } catch (error) {
+            throw new DatabaseError('something went wrong while writing to database');
+        }
+
+        return null;
     }
 
-    const userId = user.id;
-    const token = generateJWT(userId);
+    public async login(username: string, password: string): Promise<string> {
+        const user: User | null = await this.userRepo.findUserByUsername(username);
 
-    return token;
+        if (user == null) {
+            throw new CredentialError('username or password invalid');
+        }
+
+        const hashedPassword: string = user.password;
+
+        if (!bcrypt.compareSync(password, hashedPassword)) {
+            throw new CredentialError('username or password invalid');
+        }
+
+        const userId = user.id;
+        const token = generateJWT(userId);
+
+        return token;
+    }
 }
