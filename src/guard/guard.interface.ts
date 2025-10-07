@@ -3,7 +3,7 @@ export interface GuardResponse {
 }
 
 export interface GuardRequest {
-    token: string;
+    tokenHeader?: string;
 }
 
 export interface IGuardService {
