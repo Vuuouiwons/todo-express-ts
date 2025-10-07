@@ -1,11 +1,12 @@
 const express = require('express');
 const todolistRouter = express.Router({ mergeParams: true });
 
-import { handleGetTodolist, handleAddTodolist, handleUpdateTodolist, handleDeleteTodolist } from './todolist.controller'
+import { handleGetAllTodolist, handleGetTodolist, handleAddTodolist, handleUpdateTodolist, handleDeleteTodolist } from './todolist.controller'
 
-todolistRouter.get('/', handleGetTodolist);
+todolistRouter.get('/', handleGetAllTodolist);
 todolistRouter.post('/', handleAddTodolist);
-todolistRouter.put('/:todoId', handleUpdateTodolist);
-todolistRouter.delete('/:todoId', handleDeleteTodolist);
+todolistRouter.get('/:todolistId', handleGetTodolist)
+todolistRouter.put('/:todolistId', handleUpdateTodolist);
+todolistRouter.delete('/:todolistId', handleDeleteTodolist);
 
 export { todolistRouter }

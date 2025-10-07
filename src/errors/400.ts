@@ -18,3 +18,10 @@ export class CredentialError extends Error {
         this.name = 'CredentialError';
     }
 }
+
+export class MissingData extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'MissingData';
+    }
+}

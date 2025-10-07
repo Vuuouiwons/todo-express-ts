@@ -1,16 +1,25 @@
 import { Request, Response } from "express";
 import { createTodolistSchema, updateTodolistSchema } from './todolist.validator';
 import { parseResponse } from "../../common/response";
-import { getAllTodolist, createTodolist } from './todolist.service'
+import { TodolistService, TodolistServiceInterface } from './todolist.service'
 
-const handleGetTodolist = async (req: Request, res: Response) => {
+const todolistService: TodolistServiceInterface = new TodolistService()
+
+const handleGetAllTodolist = async (req: Request, res: Response) => {
     const userId = res.locals.userId;
 
     const limit = Number(req.query.limit) || 20;
     const offset = Number(req.query.offset) || 0;
 
-    return res.status(200).send(await getAllTodolist(userId, limit, offset));
+    return res.status(200).send(await todolistService.getAllTodolist(userId, limit, offset));
 };
+
+const handleGetTodolist = async (req: Request, res: Response) => {
+    const userId: number = res.locals.userId;
+    const todolistId: number = Number(req.params.todolistId);
+
+    return res.status(200).send(await todolistService.getOneTodolist(userId, todolistId))
+}
 
 const handleAddTodolist = async (req: Request, res: Response) => {
     const result = createTodolistSchema.safeParse(req.body);
@@ -25,7 +34,7 @@ const handleAddTodolist = async (req: Request, res: Response) => {
     const data = result.data;
     const title = data.title;
 
-    return res.status(200).send(await createTodolist(userId, title));
+    return res.status(200).send(await todolistService.createTodolist(userId, title));
 
 };
 const handleUpdateTodolist = async (req: Request, res: Response) => {
@@ -37,13 +46,22 @@ const handleUpdateTodolist = async (req: Request, res: Response) => {
             .send(parseResponse("TL", 422, 'invalid body', result.error.format()));
     }
 
-    const userId = res.locals.userInformation.userId;
-    const todolistId = req.params.listId;
+    const userId = res.locals.userId;
+    const todolistId = Number(req.params.todolistId);
+    const title = result.data.title;
+    const status = result.data.status;
 
+    await todolistService.updateTodolist(userId, todolistId, title, status)
+
+    return res.status(201).send(parseResponse('TL', 201))
 };
 const handleDeleteTodolist = async (req: Request, res: Response) => {
-    const todolistId = req.params.listId;
-    const userId = res.locals.userInformation.userId;
+    const todolistId = Number(req.params.todolistId);
+    const userId = res.locals.userId;
+
+    await todolistService.deleteTodolist(userId, todolistId);
+
+    return res.status(204).send(parseResponse('TL', 204));
 };
 
-export { handleGetTodolist, handleAddTodolist, handleUpdateTodolist, handleDeleteTodolist }
+export { handleGetAllTodolist, handleGetTodolist, handleAddTodolist, handleUpdateTodolist, handleDeleteTodolist }
