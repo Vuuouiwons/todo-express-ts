@@ -4,7 +4,7 @@ const v1Router = express.Router({ mergeParams: true });
 import { todolistRouter } from './todolist/todolist.route';
 import { todoRouter } from './todo/todo.route';
 import { authRouter } from './auth/auth.route';
-import { isAuthorized } from '../guard/jwt';
+import { isAuthorized } from '../middlewares/auth/auth';
 
 // INSECURED
 v1Router.use('/auth', authRouter);
