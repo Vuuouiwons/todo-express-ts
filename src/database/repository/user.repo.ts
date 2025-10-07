@@ -1,6 +1,7 @@
+import { Repository } from "typeorm";
+
 import { AppDataSource } from "../index";
 import { User } from "../models/user.model";
-import { Repository } from "typeorm";
 
 const userRepository = AppDataSource.getRepository(User);
 

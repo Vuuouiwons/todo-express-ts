@@ -16,10 +16,15 @@ export class TodolistService implements TodolistServiceInterface {
         this.todolistRepo = todolistRepo ? todolistRepo : new TodolistRepo()
     }
 
-    public async getAllTodolist(userId: number, limit: number, offset: number): Promise<Todolist[]> {
-        const allTodolist = await this.todolistRepo.getTodolistByUserId(userId, limit, offset);
+    public async getAllTodolist(userId: number, limit: number, offset: number): Promise<Todolist[] | null> {
+        try {
 
-        return allTodolist;
+            const allTodolist = await this.todolistRepo.getTodolistByUserId(userId, limit, offset);
+
+            return allTodolist;
+        } catch (e) {
+            return null;
+        }
     }
 
     public async getOneTodolist(userId: number, id: number): Promise<Todolist | null> {

@@ -1,9 +1,10 @@
+import { Repository } from "typeorm";
+
 import { AppDataSource } from "../index";
 import { Todolist } from "../models/todolist.model";
 import { User } from "../models/user.model";
 import { DatabaseError } from "../../errors/500";
 import { MissingData } from "../../errors/400";
-import { Repository } from "typeorm";
 
 export interface TodolistRepoInterface {
     getTodolistByUserId(userId: number, limit: number, offset: number): Promise<Todolist[]>;
@@ -74,20 +75,20 @@ export class TodolistRepo implements TodolistRepoInterface {
     }
 
     public async updateTodolistById(userId: number, id: number, title?: string, status?: boolean): Promise<null> {
-        const todolist = await this.getTodolistById(userId, id);
-
-        if (!todolist) {
-            throw new Error('todolist does\'t exist');
-        }
-
-        if (title !== undefined && title !== null) {
-            todolist.title = title;
-        }
-
-        if (status !== undefined && status !== null) {
-            todolist.status = status;
-        }
         try {
+            const todolist = await this.getTodolistById(userId, id);
+
+            if (!todolist) {
+                throw new Error('todolist does\'t exist');
+            }
+
+            if (title !== undefined && title !== null) {
+                todolist.title = title;
+            }
+
+            if (status !== undefined && status !== null) {
+                todolist.status = status;
+            }
 
             await this.todolistRepository.save(todolist);
 
@@ -98,12 +99,12 @@ export class TodolistRepo implements TodolistRepoInterface {
     }
 
     public async deleteTodolistById(userId: number, id: number): Promise<null> {
-        const todolist = await this.getTodolistById(userId, id);
-
-        if (!todolist) {
-            throw new Error('todolist does\'t exist')
-        }
         try {
+            const todolist = await this.getTodolistById(userId, id);
+
+            if (!todolist) {
+                throw new Error('todolist does\'t exist')
+            }
 
             await this.todolistRepository.remove(todolist);
 

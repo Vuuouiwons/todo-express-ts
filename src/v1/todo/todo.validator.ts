@@ -6,7 +6,7 @@ const addTodoSchema = z.object({
 
 const updateTodoSchema = z.object({
     message: z.string().max(225).optional(),
-    status: z.string().optional()
+    status: z.boolean().optional()
 });
 
 export { addTodoSchema, updateTodoSchema };
