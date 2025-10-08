@@ -4,7 +4,7 @@ import { AppDataSource } from "../index";
 import { Todolist } from "../models/todolist.model";
 import { User } from "../models/user.model";
 import { DatabaseError } from "../../errors/500";
-import { MissingData } from "../../errors/400";
+import { NotFound } from "../../errors/400";
 
 export interface TodolistRepoInterface {
     getTodolistByUserId(userId: number, limit: number, offset: number): Promise<Todolist[]>;
@@ -51,7 +51,7 @@ export class TodolistRepo implements TodolistRepoInterface {
             });
 
             if (!todolist) {
-                throw new MissingData('todolist not found');
+                throw new NotFound('todolist not found');
             }
 
             return todolist;
