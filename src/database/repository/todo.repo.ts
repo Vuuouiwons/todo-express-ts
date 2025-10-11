@@ -1,13 +1,10 @@
 import { Repository } from "typeorm";
 
 import { AppDataSource } from "../index";
-import { User } from "../models/user.model";
 import { Todolist } from "../models/todolist.model";
 import { Todo } from '../models/todo.model';
 
 import { DatabaseError } from "../../errors/500";
-
-const todolistRepository = AppDataSource.getRepository(Todo);
 
 export interface TodoRepoInterface {
     getAllTodoByTodolistId(userId: number, todolistId: number, limit: number, offset: number): Promise<Todo[] | null>;
