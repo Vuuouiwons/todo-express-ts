@@ -19,9 +19,9 @@ export class CredentialError extends Error {
     }
 }
 
-export class MissingData extends Error {
+export class NotFoundError extends Error {
     constructor(message: string) {
         super(message);
-        this.name = 'MissingData';
+        this.name = 'NotFoundError';
     }
 }
