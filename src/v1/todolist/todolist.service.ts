@@ -2,11 +2,18 @@ import { Todolist } from '../../database/models/todolist.model';
 import { TodolistRepo, TodolistRepoInterface } from '../../database/repository/todolist.repo'
 
 export interface TodolistServiceInterface {
-    getAllTodolist(userId: number, limit: number, offset: number): Promise<Todolist[] | null>;
-    getOneTodolist(userId: number, id: number): Promise<Todolist | null>;
+    getAllTodolist(userId: number, limit: number, offset: number): Promise<TodolistData[] | null>;
+    getOneTodolist(userId: number, id: number): Promise<TodolistData | null>;
     createTodolist(userId: number, title: string): Promise<null>;
     updateTodolist(userId: number, id: number, title: string | undefined, status: boolean | undefined): Promise<null>;
     deleteTodolist(userId: number, id: number): Promise<null>;
+}
+
+export interface TodolistData {
+    id: number;
+    title: string;
+    status: boolean;
+    updatedAt: Date;
 }
 
 export class TodolistService implements TodolistServiceInterface {
@@ -16,37 +23,59 @@ export class TodolistService implements TodolistServiceInterface {
         this.todolistRepo = todolistRepo ? todolistRepo : new TodolistRepo()
     }
 
-    public async getAllTodolist(userId: number, limit: number, offset: number): Promise<Todolist[] | null> {
+    public async getAllTodolist(userId: number, limit: number, offset: number): Promise<TodolistData[] | null> {
         try {
-
             const allTodolist = await this.todolistRepo.getTodolistByUserId(userId, limit, offset);
 
-            return allTodolist;
+            const parsedData = allTodolist.map(d => {
+                return {
+                    'id': d.id,
+                    'title': d.title,
+                    'status': d.status,
+                    'updatedAt': d.updatedAt,
+                };
+            });
+
+            return parsedData;
         } catch (e) {
-            return null;
+            throw e;
         }
     }
 
-    public async getOneTodolist(userId: number, id: number): Promise<Todolist | null> {
+    public async getOneTodolist(userId: number, id: number): Promise<TodolistData | null> {
         try {
             const todolist = await this.todolistRepo.getTodolistById(userId, id);
+            const parsedData = {
+                'id': todolist.id,
+                'title': todolist.title,
+                'status': todolist.status,
+                'updatedAt': todolist.updatedAt,
+            };
 
-            return todolist;
+            return parsedData;
         } catch (e) {
-            return null
+            throw e;
         }
     }
 
     public async createTodolist(userId: number, title: string): Promise<null> {
-        await this.todolistRepo.insertTodolistByUserId(userId, title);
+        try {
+            await this.todolistRepo.insertTodolistByUserId(userId, title);
 
-        return null;
+            return null;
+        } catch (e) {
+            throw e;
+        }
     }
 
     public async updateTodolist(userId: number, id: number, title: string, status: boolean): Promise<null> {
-        await this.todolistRepo.updateTodolistById(userId, id, title, status);
+        try {
+            await this.todolistRepo.updateTodolistById(userId, id, title, status);
 
-        return null;
+            return null;
+        } catch (e) {
+            throw e;
+        }
     }
 
     public async deleteTodolist(userId: number, id: number): Promise<null> {
@@ -55,8 +84,7 @@ export class TodolistService implements TodolistServiceInterface {
 
             return null;
         } catch (e) {
-            return null;
+            throw e;
         }
     }
 }
-
