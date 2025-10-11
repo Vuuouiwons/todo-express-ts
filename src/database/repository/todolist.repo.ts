@@ -3,8 +3,7 @@ import { Repository } from "typeorm";
 import { AppDataSource } from "../index";
 import { Todolist } from "../models/todolist.model";
 import { User } from "../models/user.model";
-import { DatabaseError } from "../../errors/500";
-import { MissingData } from "../../errors/400";
+import { NotFoundError } from "../../errors/400";
 
 export interface TodolistRepoInterface {
     getTodolistByUserId(userId: number, limit: number, offset: number): Promise<Todolist[]>;
@@ -33,9 +32,13 @@ export class TodolistRepo implements TodolistRepoInterface {
                 take: limit,
             });
 
+            if (!todolist) {
+                throw new NotFoundError('todolist not found');
+            }
+
             return todolist;
         } catch (e: any) {
-            throw new DatabaseError(e.message);
+            throw e;
         }
     }
 
@@ -51,12 +54,12 @@ export class TodolistRepo implements TodolistRepoInterface {
             });
 
             if (!todolist) {
-                throw new MissingData('todolist not found');
+                throw new NotFoundError('todolist not found');
             }
 
             return todolist;
         } catch (e: any) {
-            throw new DatabaseError(e);
+            throw e;
         }
     }
 
@@ -70,7 +73,7 @@ export class TodolistRepo implements TodolistRepoInterface {
 
             return null;
         } catch (e: any) {
-            throw new DatabaseError(e.message);
+            throw e;
         }
     }
 
@@ -79,7 +82,7 @@ export class TodolistRepo implements TodolistRepoInterface {
             const todolist = await this.getTodolistById(userId, id);
 
             if (!todolist) {
-                throw new Error('todolist does\'t exist');
+                throw new NotFoundError('todolist does\'t exist');
             }
 
             if (title !== undefined && title !== null) {
@@ -94,7 +97,7 @@ export class TodolistRepo implements TodolistRepoInterface {
 
             return null;
         } catch (e: any) {
-            throw new DatabaseError(e.message)
+            throw e;
         }
     }
 
@@ -103,14 +106,14 @@ export class TodolistRepo implements TodolistRepoInterface {
             const todolist = await this.getTodolistById(userId, id);
 
             if (!todolist) {
-                throw new Error('todolist does\'t exist')
+                throw new NotFoundError('todolist does\'t exist')
             }
 
             await this.todolistRepository.remove(todolist);
 
             return null;
         } catch (e: any) {
-            throw new DatabaseError(e.message)
+            throw e;
         }
     }
 }
