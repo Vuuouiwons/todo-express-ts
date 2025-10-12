@@ -20,14 +20,12 @@ export class TodolistService implements TodolistServiceInterface {
             const allTodolist = await this.todolistRepo.getTodolistByUserId(userId, limit, offset);
 
             const parsedData = allTodolist.map(d => {
-                const data = {
+                return {
                     'id': d.id,
                     'title': d.title,
                     'status': d.status,
                     'updatedAt': d.updatedAt,
                 };
-
-                return data;
             });
 
             return parsedData;
