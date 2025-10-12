@@ -1,8 +1,7 @@
 import bcrypt from "bcryptjs";
 
-import { } from '../../database/repository/user.repo';
 import { User } from '../../database/models/user.model';
-import { UsernameExistsError, UsernameDoesNotExistsError, CredentialError } from "../../errors/400";
+import { UsernameExistsError, CredentialError } from "../../errors/400";
 import { DatabaseError } from "../../errors/500";
 import { generateJWT } from '../../helper/jwt';
 import { UserRepo, UserRepoInterface } from "../../database/repository/user.repo";

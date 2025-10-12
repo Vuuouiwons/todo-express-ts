@@ -47,6 +47,19 @@ function res204(
         });
 }
 
+function res400(
+    res: Response,
+    controllerId: string,
+    message: string,
+) {
+    return res
+        .status(400)
+        .send({
+            status: `${controllerId}-400`,
+            'message': message
+        })
+}
+
 function res422(
     res: Response,
     controllerId: string,
@@ -89,4 +102,4 @@ function res500(
         });
 }
 
-export { parseResponse, res200, res201, res204, res422, res404, res500 };
+export { parseResponse, res200, res201, res204, res400, res422, res404, res500 };

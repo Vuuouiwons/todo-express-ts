@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { registerSchema, loginSchema } from './auth.validator';
-import { parseResponse } from '../../common/response';
 
 import { AuthService, AuthServiceInterface } from './auth.service'
 import { UsernameExistsError, CredentialError } from '../../errors/400';
-import { DatabaseError } from '../../errors/500';
+import { res200, res201, res400, res422, res500 } from "../../common/response";
+
 
 const authService: AuthServiceInterface = new AuthService()
 
@@ -12,27 +12,21 @@ const handleRegister = async (req: Request, res: Response) => {
     const result = registerSchema.safeParse(req.body);
 
     if (!result.success) {
-        return res
-            .status(422)
-            .send(parseResponse('RE', 422, 'invalid body', result.error.format()));
+        return res422(res, 'RE', result.error.format());
     }
 
     const { username, password } = result.data;
 
     try {
         await authService.register(username, password);
-        return res
-            .status(201)
-            .send(parseResponse('RE', 201));
+
+        return res201(res, 'RE');
     } catch (e: unknown) {
         if (e instanceof UsernameExistsError) {
-            return res.status(400).send(parseResponse('RE', 400, e.message));
-        }
-        if (e instanceof DatabaseError) {
-            return res.status(500).send(parseResponse('RE', 500, e.message));
+            return res400(res, 'RE', e.message);
         }
 
-        return res.status(500).send(parseResponse('RE', 500, 'unhandled error'))
+        return res500(res, 'RE');
     }
 }
 
@@ -40,9 +34,7 @@ const handleLogin = async (req: Request, res: Response) => {
     const result = loginSchema.safeParse(req.body);
 
     if (!result.success) {
-        return res
-            .status(422)
-            .send(parseResponse('RE', 422, 'invalid body', result.error.format()));
+        return res422(res, 'RE', result.error.format());
     }
 
     const { username, password } = result.data;
@@ -50,17 +42,13 @@ const handleLogin = async (req: Request, res: Response) => {
     try {
         const token = await authService.login(username, password);
 
-        return res.status(200).send(parseResponse('RE', 200, null, { token }));
+        return res200(res, 'LO', { token });
     } catch (e) {
         if (e instanceof CredentialError) {
-            return res
-                .status(400)
-                .send(parseResponse('RE', 400, e.message));
+            return res400(res, 'LO', e.message);
         }
 
-        return res
-            .status(500)
-            .send(parseResponse('RE', 500, 'unhandled error'));
+        return res500(res, 'LO');
     }
 }
 
