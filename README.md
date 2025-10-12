@@ -10,7 +10,10 @@ Describe the tech stack used to make this todo app.
 4. typescript
 
 ## etc Tech stack
-Supporting microservices
+Supporting microservices use docker to install etc techstack, the compose is provided as `docker-compose-etc.yml`
+```bash
+docker compose -f docker-compose-etc.yml up -d
+```
 1. postgresql
 2. redis
 
