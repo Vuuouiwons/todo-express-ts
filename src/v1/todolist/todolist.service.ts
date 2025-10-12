@@ -1,19 +1,11 @@
-import { Todolist } from '../../database/models/todolist.model';
 import { TodolistRepo, TodolistRepoInterface } from '../../database/repository/todolist.repo'
-
+import { TodolistData } from './todolist.validator';
 export interface TodolistServiceInterface {
     getAllTodolist(userId: number, limit: number, offset: number): Promise<TodolistData[] | null>;
     getOneTodolist(userId: number, id: number): Promise<TodolistData | null>;
     createTodolist(userId: number, title: string): Promise<null>;
     updateTodolist(userId: number, id: number, title: string | undefined, status: boolean | undefined): Promise<null>;
     deleteTodolist(userId: number, id: number): Promise<null>;
-}
-
-export interface TodolistData {
-    id: number;
-    title: string;
-    status: boolean;
-    updatedAt: Date;
 }
 
 export class TodolistService implements TodolistServiceInterface {
@@ -28,12 +20,14 @@ export class TodolistService implements TodolistServiceInterface {
             const allTodolist = await this.todolistRepo.getTodolistByUserId(userId, limit, offset);
 
             const parsedData = allTodolist.map(d => {
-                return {
+                const data = {
                     'id': d.id,
                     'title': d.title,
                     'status': d.status,
                     'updatedAt': d.updatedAt,
                 };
+
+                return data;
             });
 
             return parsedData;

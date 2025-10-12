@@ -9,4 +9,11 @@ const updateTodolistSchema = z.object({
     status: z.boolean().optional()
 })
 
-export { updateTodolistSchema, createTodolistSchema }
+interface TodolistData {
+    id: number;
+    title: string;
+    status: boolean;
+    updatedAt: Date;
+};
+
+export { updateTodolistSchema, createTodolistSchema, TodolistData };
