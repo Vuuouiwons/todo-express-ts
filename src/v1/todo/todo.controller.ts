@@ -1,90 +1,94 @@
 import { Request, Response } from "express";
-import { addTodo, updateTodo, deleteTodo } from "./todo.service";
-import { addTodoSchema, updateTodoSchema } from "./dto/todo.request";
-import { parseResponse, parseError } from "../../common/dto/response";
+import { addTodoSchema, updateTodoSchema } from "./todo.validator";
+import { parseResponse, res200, res201, res204, res422, res500 } from "../../common/response";
+
+import { TodoService } from "./todo.service";
+
+const todoService = new TodoService();
+
+const handleGetAllTodo = async (req: Request, res: Response) => {
+    const userId = res.locals.userId;
+    const limit = Number(req.query.limit) || 20;
+    const offset = Number(req.query.offset) || 0;
+    const todolistId = Number(req.params.todolistId);
+
+    try {
+        const todo = await todoService.getAllTodo(userId, todolistId, limit, offset);
+        return res200(res, 'TO', todo);
+    } catch (e) {
+        return res500(res, 'TO');
+    }
+
+}
+
+const handleGetOneTodo = async (req: Request, res: Response) => {
+    const userId = res.locals.userId;
+    const todolistId = Number(req.params.todolistId);
+    const todoId = Number(req.params.todoId);
+
+    try {
+        const todo = await todoService.getOneTodo(userId, todolistId, todoId);
+
+        return res200(res, 'TO', todo);
+    } catch (e) {
+        return res500(res, 'TO');
+    }
+}
 
 const handleAddTodo = async (req: Request, res: Response) => {
     const result = addTodoSchema.safeParse(req.body);
+    const userId = res.locals.userId;
 
     if (!result.success) {
-        return res
-            .status(422)
-            .send(parseResponse(0, 'TO', 422, 'invalid body', result.error.format()));
+        return res422(res, 'TO', result.error.format())
     };
 
-    const { message } = req.body;
-    const listId = req.params.listId;
+    const { message } = result.data;
+    const todolistId = Number(req.params.todolistId);
 
-    addTodo(listId, message, res.locals.userInformation)
-        .then(
-            payload => {
-                return res.status(201).send(parseResponse(0, 'TO', 201, '', payload));
-            })
-        .catch(e => {
-            if (e.message === 'todolist does not exist')
-                return res
-                    .status(400)
-                    .send(parseError(0, 'TO', 400, e.message));
+    try {
+        const todo = await todoService.createTodo(userId, todolistId, message);
 
-            return res
-                .status(500)
-                .send(parseError(0, 'TO', 500, e.message));
-        });
+        return res201(res, 'TO', todo);
+    } catch (e) {
+        return res500(res, 'TO');
+    }
 };
 
 const handleUpdateTodo = async (req: Request, res: Response) => {
     const result = updateTodoSchema.safeParse(req.body);
+    const userId = res.locals.userId;
 
     if (!result.success) {
-        return res
-            .status(422)
-            .send(parseResponse(0, 'TO', 422, 'invalid body', result.error.format()));
+        return res422(res, 'TO', result.error.format());
     };
 
-    const listId = req.params.listId;
-    const todoId = req.params.todoId;
+    const todolistId = Number(req.params.todolistId);
+    const todoId = Number(req.params.todoId);
     const { message, status } = req.body;
 
-    updateTodo(listId, todoId, status, message, res.locals.userInformation)
-        .then(payload => {
-            return res
-                .status(201)
-                .send(parseResponse(0, 'TO', 201, '', payload));
-        })
-        .catch(e => {
-            console.log(e);
-            if (e.message === 'todolist does not exist' ||
-                e.message === 'todo does not exist')
-                return res
-                    .status(400)
-                    .send(parseError(0, 'TO', 400, e.message));
+    try {
+        const todo = await todoService.updateTodo(userId, todolistId, todoId, message, status);
 
-            return res
-                .status(500)
-                .send(parseError(0, 'TO', 500, e.message));
+        return res201(res, 'TO', todo);
+    } catch {
+        return res500(res, 'TO');
+    }
 
-        });
 };
 
 const handleDeleteTodo = async (req: Request, res: Response) => {
-    const listId = req.params.listId;
-    const todoId = req.params.todoId;
+    const userId = res.locals.userId;
+    const todolistId = Number(req.params.todolistId);
+    const todoId = Number(req.params.todoId);
 
-    deleteTodo(listId, todoId, res.locals.userInformation)
-        .then(payload => {
-            return res.status(204).send();
-        })
-        .catch(e => {
-            if (e.message === 'todolist does not exist' ||
-                e.message === 'todo does not exist'
-            )
-                return res
-                    .status(400)
-                    .send(parseError(0, "TO", 400, e.message));
-            return res
-                .status(500)
-                .send(parseError(0, 'TO', 500, e.message));
-        });
+    try {
+        await todoService.deleteTodo(userId, todolistId, todoId);
+
+        return res204(res, 'TO');
+    } catch (e) {
+        return res500(res, 'TO');
+    }
 };
 
-export { handleAddTodo, handleUpdateTodo, handleDeleteTodo }
+export { handleGetAllTodo, handleGetOneTodo, handleAddTodo, handleUpdateTodo, handleDeleteTodo }

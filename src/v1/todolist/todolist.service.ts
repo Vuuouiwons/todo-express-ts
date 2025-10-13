@@ -1,80 +1,84 @@
-import { InsertResult } from "typeorm";
-import { UserInformation } from "../user/dto/user.request";
-import { todolistMap } from "./mappings/todolist.map";
-import { todoMap } from "../todo/mappings/todo.map";
-import { addTodolistByUsername, getAllTodolistByUsername, getTodolistById, updateTodolistStatusById, deleteTodolistById, deleteTodoByTodolistId, getTodoByTodolistId } from "./todolist.repository";
-import { Todolist } from "./entity/todolist.entity";
-import { TodolistData } from './dto/todolist.response';
-
-const getAllTodolist = async (username: string, userInformation: UserInformation, limit: number, offset: number): Promise<Todolist[] | null> => {
-    const todolists = await getAllTodolistByUsername(username, limit, offset);
-
-    if (!todolists || todolists.length === 0) {
-        return null
-    }
-
-    const mappedTodolists = todolists.map(todolistMap);
-
-    if (!mappedTodolists) {
-        return null
-    }
-
-    return mappedTodolists
+import { TodolistRepo, TodolistRepoInterface } from '../../database/repository/todolist.repo'
+import { TodolistData, filterTodolistData } from './todolist.validator';
+export interface TodolistServiceInterface {
+    getAllTodolist(userId: number, limit: number, offset: number): Promise<TodolistData[]>;
+    getOneTodolist(userId: number, id: number): Promise<TodolistData>;
+    createTodolist(userId: number, title: string): Promise<TodolistData>;
+    updateTodolist(userId: number, id: number, title: string | undefined, status: boolean | undefined): Promise<TodolistData>;
+    deleteTodolist(userId: number, id: number): Promise<null>;
 }
 
-const updateTodolist = async (id: string, data: any, userInformation: UserInformation): Promise<void> => {
-    const todolist = await getTodolistById(id, userInformation.id);
+export class TodolistService implements TodolistServiceInterface {
+    private todolistRepo: TodolistRepoInterface;
 
-    if (!todolist) throw new Error('todolist does not exist');
-
-    const title = data.title;
-    const status = data.status;
-
-    if (!await updateTodolistStatusById(id, userInformation.id, title, status))
-        throw new Error('update failed');
-
-}
-
-const addTodolist = async (username: string, data: any): Promise<InsertResult> => {
-    const addTodolistStatus = await addTodolistByUsername(username, data);
-    if (!addTodolistStatus) throw new Error('failed adding todolist');
-
-    return addTodolistStatus;
-}
-
-const deleteTodolist = async (id: string, userInformation: UserInformation): Promise<string> => {
-    const todolist = await getTodolistById(id, userInformation.id);
-
-    if (!todolist) {
-        return 'failed'
+    constructor(todolistRepo: TodolistRepoInterface | null = null) {
+        this.todolistRepo = todolistRepo ? todolistRepo : new TodolistRepo()
     }
 
-    const deleteTodoStatus = await deleteTodoByTodolistId(id, userInformation.id);
-    const deleteTodolistStatus = await deleteTodolistById(id, userInformation.id);
+    public async getAllTodolist(userId: number, limit: number, offset: number): Promise<TodolistData[]> {
+        try {
+            const allTodolist = await this.todolistRepo.getTodolistByUserId(userId, limit, offset);
 
-    if (!deleteTodolistStatus && !deleteTodoStatus) {
-        return 'delete failed';
+            const parsedTodolist = allTodolist.map(d => {
+                return {
+                    'id': d.id,
+                    'title': d.title,
+                    'status': d.status,
+                    'updatedAt': d.updatedAt,
+                };
+            });
+
+            return parsedTodolist;
+        } catch (e) {
+            throw e;
+        }
     }
 
-    return 'success';
+    public async getOneTodolist(userId: number, id: number): Promise<TodolistData> {
+        try {
+            const todolist = await this.todolistRepo.getTodolistById(userId, id);
+            const parsedTodolist = {
+                'id': todolist.id,
+                'title': todolist.title,
+                'status': todolist.status,
+                'updatedAt': todolist.updatedAt,
+            };
+
+            return parsedTodolist;
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    public async createTodolist(userId: number, title: string): Promise<TodolistData> {
+        try {
+            const todolist = await this.todolistRepo.insertTodolistByUserId(userId, title);
+            const parsedTodolist = filterTodolistData(todolist);
+
+            return parsedTodolist;
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    public async updateTodolist(userId: number, id: number, title: string, status: boolean): Promise<TodolistData> {
+        try {
+            const todolist = await this.todolistRepo.updateTodolistById(userId, id, title, status);
+            const parsedTodolist = filterTodolistData(todolist);
+
+            return parsedTodolist;
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    public async deleteTodolist(userId: number, id: number): Promise<null> {
+        try {
+            await this.todolistRepo.deleteTodolistById(userId, id);
+
+            return null;
+        } catch (e) {
+            throw e;
+        }
+    }
 }
-
-const getTodolist = async (id: string, userInformation: UserInformation, limit: number, offset: number): Promise<TodolistData> => {
-    const todolist = await getTodolistById(id, userInformation.id);
-
-    if (!todolist) {
-        throw new Error('todolist does not exist');
-    }
-
-    const mappedTodolist = todolistMap(todolist);
-    const todo = (await getTodoByTodolistId(id, userInformation.id, limit, offset)).map(todoMap);
-
-    const data = {
-        ...mappedTodolist,
-        todo
-    }
-
-    return data;
-}
-
-export { getAllTodolist, getTodolist, addTodolist, updateTodolist, deleteTodolist }

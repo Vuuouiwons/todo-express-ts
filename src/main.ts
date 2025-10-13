@@ -11,5 +11,5 @@ import { router } from "./main.route";
 app.use(router);
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
+    console.log(`Example app listening on port ${PORT}`);
 });

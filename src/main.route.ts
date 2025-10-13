@@ -1,24 +1,17 @@
+import { Request, Response } from 'express';
+
 const express = require('express');
 const bodyParser = require('body-parser');
-const router = express.Router();
 const morgan = require('morgan');
 const cors = require('cors')
 
-import { userRouter } from './v1/user/user.route';
-import { helloWorldRouter } from './hello/hello.route';
-import { todolistRouter } from './v1/todolist/todolist.route';
-import { todoRouter } from './v1/todo/todo.route'
-import { fetchUserInformation, isAuthorized } from './middlewares/authorization/authorization';
+import { v1Router } from './v1/v1.route'
 
 const parserMiddleware = [cors(), bodyParser.json(), morgan('dev')]
-
+const router = express.Router();
 router.use(parserMiddleware);
 
-router.use('/hello-world', helloWorldRouter);
-router.use('/', userRouter);
-
-router.use([isAuthorized, fetchUserInformation]);
-router.use('/todolists', todolistRouter);
-router.use('/todolists/:listId/todos', todoRouter);
+router.get('/health', (req: Request, res: Response) => res.status(200).json({ 'status': 'OK' }));
+router.use('/v1', v1Router);
 
 export { router };

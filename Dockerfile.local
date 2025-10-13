@@ -14,7 +14,7 @@ WORKDIR /usr/local/build
 
 COPY . .
 
-RUN npm install --only=production
+RUN npm install --omit=dev
 
 FROM node:lts-alpine3.22 AS prod
 
