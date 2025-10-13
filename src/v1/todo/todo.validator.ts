@@ -9,4 +9,11 @@ const updateTodoSchema = z.object({
     status: z.boolean().optional()
 });
 
-export { addTodoSchema, updateTodoSchema };
+interface TodoData {
+    id: number;
+    message: string;
+    status: boolean;
+    updatedAt: Date;
+};
+
+export { addTodoSchema, updateTodoSchema, TodoData };

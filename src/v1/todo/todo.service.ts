@@ -1,9 +1,10 @@
 import { Todo } from "../../database/models/todo.model";
 import { TodoRepo, TodoRepoInterface } from "../../database/repository/todo.repo";
+import { TodoData } from "./todo.validator";
 
 export interface TodoServiceInterface {
-    getAllTodo(userId: number, todolistId: number, limit: number, offset: number): Promise<Todo[] | null>;
-    getOneTodo(userId: number, todolistId: number, id: number): Promise<Todo | null>;
+    getAllTodo(userId: number, todolistId: number, limit: number, offset: number): Promise<TodoData[]>;
+    getOneTodo(userId: number, todolistId: number, id: number): Promise<TodoData>;
     createTodo(userId: number, todolistId: number, message: string): Promise<null>;
     updateTodo(userId: number, todolistId: number, id: number, message: string | undefined, status: boolean | undefined): Promise<null>;
     deleteTodo(userId: number, todolistId: number, id: number): Promise<null>;
@@ -15,44 +16,64 @@ export class TodoService implements TodoServiceInterface {
         this.todoRepo = todoRepoInject ? todoRepoInject : new TodoRepo();
     }
 
-    public async getAllTodo(userId: number, todolistId: number, limit: number, offset: number): Promise<Todo[] | null> {
+    public async getAllTodo(userId: number, todolistId: number, limit: number, offset: number): Promise<TodoData[]> {
         try {
             const todo = await this.todoRepo.getAllTodoByTodolistId(userId, todolistId, limit, offset);
 
-            return todo;
+            const parsedData: TodoData[] = todo.map(d => {
+                return {
+                    'id': d.id,
+                    'message': d.message,
+                    'status': d.status,
+                    'updatedAt': d.updatedAt,
+                }
+            });
+            return parsedData;
         } catch (e) {
-            return null;
+            throw e;
         }
     }
 
-    public async getOneTodo(userId: number, todolistId: number, id: number): Promise<Todo | null> {
+    public async getOneTodo(userId: number, todolistId: number, id: number): Promise<TodoData> {
         try {
             const todo = await this.todoRepo.getTodoByTodoId(userId, todolistId, id);
-
-            return todo;
+            const parsedData = {
+                'id': todo.id,
+                'message': todo.message,
+                'status': todo.status,
+                'updatedAt': todo.updatedAt,
+            }
+            return parsedData;
         } catch (e) {
-            return null;
+            throw e;
         }
     }
 
     public async createTodo(userId: number, todolistId: number, message: string): Promise<null> {
         try {
-            const todo = await this.todoRepo.insertTodoByTodolistId(userId, todolistId, message);
+
+            await this.todoRepo.insertTodoByTodolistId(userId, todolistId, message);
             return null;
         } catch (e) {
-            return null;
+            throw e;
         }
     }
 
     public async updateTodo(userId: number, todolistId: number, id: number, message: string | undefined, status: boolean | undefined): Promise<null> {
-        const todo = await this.todoRepo.updateTodoById(userId, todolistId, id, message, status);
-
-        return null;
+        try {
+            await this.todoRepo.updateTodoById(userId, todolistId, id, message, status);
+            return null;
+        } catch (e) {
+            throw e;
+        }
     }
 
     public async deleteTodo(userId: number, todolistId: number, id: number): Promise<null> {
-        const todo = await this.todoRepo.deleteTodoById(userId, todolistId, id);
-
-        return null;
+        try {
+            await this.todoRepo.deleteTodoById(userId, todolistId, id);
+            return null;
+        } catch (e) {
+            throw e;
+        }
     }
 }

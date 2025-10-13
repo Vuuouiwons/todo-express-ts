@@ -3,12 +3,12 @@ import { Repository } from "typeorm";
 import { AppDataSource } from "../index";
 import { Todolist } from "../models/todolist.model";
 import { Todo } from '../models/todo.model';
-
+import { NotFoundError } from "../../errors/400";
 import { DatabaseError } from "../../errors/500";
 
 export interface TodoRepoInterface {
-    getAllTodoByTodolistId(userId: number, todolistId: number, limit: number, offset: number): Promise<Todo[] | null>;
-    getTodoByTodoId(userId: number, todolistId: number, id: number): Promise<Todo | null>;
+    getAllTodoByTodolistId(userId: number, todolistId: number, limit: number, offset: number): Promise<Todo[]>;
+    getTodoByTodoId(userId: number, todolistId: number, id: number): Promise<Todo>;
     insertTodoByTodolistId(userId: number, todolistId: number, message: string): Promise<null>;
     updateTodoById(userId: number, todolistId: number, id: number, message: string | undefined, status: boolean | undefined): Promise<null>;
     deleteTodoById(userId: number, todolistId: number, id: number): Promise<null>;
@@ -20,7 +20,7 @@ export class TodoRepo implements TodoRepoInterface {
     constructor(todoRepositoryInject: Repository<Todo> | null = null) {
         this.todoRepository = todoRepositoryInject ? todoRepositoryInject : AppDataSource.getRepository(Todo);
     }
-    public async getAllTodoByTodolistId(userId: number, todolistId: number, limit: number, offset: number): Promise<Todo[] | null> {
+    public async getAllTodoByTodolistId(userId: number, todolistId: number, limit: number, offset: number): Promise<Todo[]> {
         try {
             const todo = await this.todoRepository.find({
                 where: {
@@ -35,13 +35,17 @@ export class TodoRepo implements TodoRepoInterface {
                 take: limit,
             });
 
+            if (!todo) {
+                throw new NotFoundError('todo not found');
+            }
+
             return todo;
         } catch (e: any) {
             throw new DatabaseError(e.message);
         }
     }
 
-    public async getTodoByTodoId(userId: number, todolistId: number, id: number): Promise<Todo | null> {
+    public async getTodoByTodoId(userId: number, todolistId: number, id: number): Promise<Todo> {
         try {
             const todo = await this.todoRepository.findOne({
                 where: {
@@ -54,6 +58,10 @@ export class TodoRepo implements TodoRepoInterface {
                     }
                 }
             });
+
+            if (!todo) {
+                throw new NotFoundError('todo not found');
+            }
 
             return todo;
         } catch (e: any) {
