@@ -47,6 +47,20 @@ function res204(
         });
 }
 
+function res401(
+    res: Response,
+    controllerId: string,
+    message: string | null = null,
+) {
+    message = message ?? 'unauthorized'
+    return res
+        .status(400)
+        .send({
+            status: `${controllerId}-401`,
+            'message': message
+        })
+}
+
 function res400(
     res: Response,
     controllerId: string,
@@ -102,4 +116,4 @@ function res500(
         });
 }
 
-export { parseResponse, res200, res201, res204, res400, res422, res404, res500 };
+export { parseResponse, res200, res201, res204, res400, res401, res422, res404, res500 };
