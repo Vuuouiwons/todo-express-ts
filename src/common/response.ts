@@ -28,11 +28,13 @@ function res200(
 function res201(
     res: Response,
     controllerId: string,
+    data: any = null,
 ) {
     return res
         .status(201)
         .send({
-            status: `${controllerId}-201`
+            status: `${controllerId}-201`,
+            data
         });
 }
 
