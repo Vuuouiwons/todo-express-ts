@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { addTodoSchema, updateTodoSchema } from "./todo.validator";
-import { parseResponse } from "../../common/response";
+import { parseResponse, res200, res201, res204, res422, res500 } from "../../common/response";
 
 import { TodoService } from "./todo.service";
 
@@ -14,13 +14,9 @@ const handleGetAllTodo = async (req: Request, res: Response) => {
 
     try {
         const todo = await todoService.getAllTodo(userId, todolistId, limit, offset);
-        return res
-            .status(200)
-            .send(parseResponse('TO', 201, '', todo));
+        return res200(res, 'TO', todo);
     } catch (e) {
-        return res
-            .status(500)
-            .send(parseResponse('TO', 500));
+        return res500(res, 'TO');
     }
 
 }
@@ -32,13 +28,10 @@ const handleGetOneTodo = async (req: Request, res: Response) => {
 
     try {
         const todo = await todoService.getOneTodo(userId, todolistId, todoId);
-        return res
-            .status(200)
-            .send(parseResponse('TO', 201, '', todo));
+
+        return res200(res, 'TO', todo);
     } catch (e) {
-        return res
-            .status(500)
-            .send(parseResponse('TO', 500));
+        return res500(res, 'TO');
     }
 }
 
@@ -47,20 +40,18 @@ const handleAddTodo = async (req: Request, res: Response) => {
     const userId = res.locals.userId;
 
     if (!result.success) {
-        return res
-            .status(422)
-            .send(parseResponse('TO', 422, 'invalid body', result.error.format()));
+        return res422(res, 'TO', result.error.format())
     };
 
     const { message } = result.data;
     const todolistId = Number(req.params.todolistId);
 
     try {
-        await todoService.createTodo(userId, todolistId, message);
+        const todo = await todoService.createTodo(userId, todolistId, message);
 
-        return res.status(201).send(parseResponse('TO', 201));
+        return res201(res, 'TO', todo);
     } catch (e) {
-        return res.status(500).send(parseResponse('TO', 500));
+        return res500(res, 'TO');
     }
 };
 
@@ -69,9 +60,7 @@ const handleUpdateTodo = async (req: Request, res: Response) => {
     const userId = res.locals.userId;
 
     if (!result.success) {
-        return res
-            .status(422)
-            .send(parseResponse('TO', 422, 'invalid body', result.error.format()));
+        return res422(res, 'TO', result.error.format());
     };
 
     const todolistId = Number(req.params.todolistId);
@@ -79,15 +68,11 @@ const handleUpdateTodo = async (req: Request, res: Response) => {
     const { message, status } = req.body;
 
     try {
-        await todoService.updateTodo(userId, todolistId, todoId, message, status);
+        const todo = await todoService.updateTodo(userId, todolistId, todoId, message, status);
 
-        return res
-            .status(201)
-            .send(parseResponse('TO', 201));
+        return res201(res, 'TO', todo);
     } catch {
-        return res
-            .status(500)
-            .send(parseResponse('TO', 500));
+        return res500(res, 'TO');
     }
 
 };
@@ -99,11 +84,11 @@ const handleDeleteTodo = async (req: Request, res: Response) => {
 
     try {
         await todoService.deleteTodo(userId, todolistId, todoId);
+
+        return res204(res, 'TO');
     } catch (e) {
+        return res500(res, 'TO');
     }
-    return res
-        .status(204)
-        .send();
 };
 
 export { handleGetAllTodo, handleGetOneTodo, handleAddTodo, handleUpdateTodo, handleDeleteTodo }

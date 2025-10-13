@@ -8,8 +8,8 @@ import { NotFoundError } from "../../errors/400";
 export interface TodolistRepoInterface {
     getTodolistByUserId(userId: number, limit: number, offset: number): Promise<Todolist[]>;
     getTodolistById(userId: number, id: number): Promise<Todolist>;
-    insertTodolistByUserId(userId: number, title: string): Promise<null>;
-    updateTodolistById(userId: number, id: number, title?: string, status?: boolean): Promise<null>;
+    insertTodolistByUserId(userId: number, title: string): Promise<Todolist>;
+    updateTodolistById(userId: number, id: number, title?: string, status?: boolean): Promise<Todolist>;
     deleteTodolistById(userId: number, id: number): Promise<null>;
 }
 
@@ -63,21 +63,21 @@ export class TodolistRepo implements TodolistRepoInterface {
         }
     }
 
-    public async insertTodolistByUserId(userId: number, title: string): Promise<null> {
+    public async insertTodolistByUserId(userId: number, title: string): Promise<Todolist> {
         const todolist = new Todolist()
         todolist.title = title;
         todolist.user = { id: userId } as User;
 
         try {
-            await this.todolistRepository.save(todolist);
+            const newTodolist = await this.todolistRepository.save(todolist);
 
-            return null;
+            return newTodolist;
         } catch (e: any) {
             throw e;
         }
     }
 
-    public async updateTodolistById(userId: number, id: number, title?: string, status?: boolean): Promise<null> {
+    public async updateTodolistById(userId: number, id: number, title?: string, status?: boolean): Promise<Todolist> {
         try {
             const todolist = await this.getTodolistById(userId, id);
 
@@ -93,9 +93,9 @@ export class TodolistRepo implements TodolistRepoInterface {
                 todolist.status = status;
             }
 
-            await this.todolistRepository.save(todolist);
+            const newTodolist = await this.todolistRepository.save(todolist);
 
-            return null;
+            return newTodolist;
         } catch (e: any) {
             throw e;
         }

@@ -9,8 +9,8 @@ import { DatabaseError } from "../../errors/500";
 export interface TodoRepoInterface {
     getAllTodoByTodolistId(userId: number, todolistId: number, limit: number, offset: number): Promise<Todo[]>;
     getTodoByTodoId(userId: number, todolistId: number, id: number): Promise<Todo>;
-    insertTodoByTodolistId(userId: number, todolistId: number, message: string): Promise<null>;
-    updateTodoById(userId: number, todolistId: number, id: number, message: string | undefined, status: boolean | undefined): Promise<null>;
+    insertTodoByTodolistId(userId: number, todolistId: number, message: string): Promise<Todo>;
+    updateTodoById(userId: number, todolistId: number, id: number, message: string | undefined, status: boolean | undefined): Promise<Todo>;
     deleteTodoById(userId: number, todolistId: number, id: number): Promise<null>;
 }
 
@@ -69,7 +69,7 @@ export class TodoRepo implements TodoRepoInterface {
         }
     }
 
-    public async insertTodoByTodolistId(userId: number, todolistId: number, message: string): Promise<null> {
+    public async insertTodoByTodolistId(userId: number, todolistId: number, message: string): Promise<Todo> {
         try {
             const todo = new Todo();
             todo.message = message;
@@ -80,15 +80,15 @@ export class TodoRepo implements TodoRepoInterface {
                 }
             } as Todolist;
 
-            await this.todoRepository.save(todo);
+            const newTodo = await this.todoRepository.save(todo);
 
-            return null;
+            return newTodo;
         } catch (e: any) {
             throw new DatabaseError(e.message);
         }
     }
 
-    public async updateTodoById(userId: number, todolistId: number, id: number, message: string | undefined, status: boolean | undefined): Promise<null> {
+    public async updateTodoById(userId: number, todolistId: number, id: number, message: string | undefined, status: boolean | undefined): Promise<Todo> {
         try {
             const todo = await this.getTodoByTodoId(userId, todolistId, id);
 
@@ -104,9 +104,9 @@ export class TodoRepo implements TodoRepoInterface {
                 todo.status = status;
             }
 
-            await this.todoRepository.save(todo);
+            const newTodo = await this.todoRepository.save(todo);
 
-            return null;
+            return newTodo;
         } catch (e: any) {
             throw new DatabaseError(e);
         }

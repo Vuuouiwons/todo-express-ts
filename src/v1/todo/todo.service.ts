@@ -1,12 +1,12 @@
 import { Todo } from "../../database/models/todo.model";
 import { TodoRepo, TodoRepoInterface } from "../../database/repository/todo.repo";
-import { TodoData } from "./todo.validator";
+import { filterTodoData, TodoData } from "./todo.validator";
 
 export interface TodoServiceInterface {
     getAllTodo(userId: number, todolistId: number, limit: number, offset: number): Promise<TodoData[]>;
     getOneTodo(userId: number, todolistId: number, id: number): Promise<TodoData>;
-    createTodo(userId: number, todolistId: number, message: string): Promise<null>;
-    updateTodo(userId: number, todolistId: number, id: number, message: string | undefined, status: boolean | undefined): Promise<null>;
+    createTodo(userId: number, todolistId: number, message: string): Promise<TodoData>;
+    updateTodo(userId: number, todolistId: number, id: number, message: string | undefined, status: boolean | undefined): Promise<TodoData>;
     deleteTodo(userId: number, todolistId: number, id: number): Promise<null>;
 }
 
@@ -19,8 +19,7 @@ export class TodoService implements TodoServiceInterface {
     public async getAllTodo(userId: number, todolistId: number, limit: number, offset: number): Promise<TodoData[]> {
         try {
             const todo = await this.todoRepo.getAllTodoByTodolistId(userId, todolistId, limit, offset);
-
-            const parsedData: TodoData[] = todo.map(d => {
+            const parsedTodo: TodoData[] = todo.map(d => {
                 return {
                     'id': d.id,
                     'message': d.message,
@@ -28,7 +27,8 @@ export class TodoService implements TodoServiceInterface {
                     'updatedAt': d.updatedAt,
                 }
             });
-            return parsedData;
+
+            return parsedTodo;
         } catch (e) {
             throw e;
         }
@@ -37,32 +37,32 @@ export class TodoService implements TodoServiceInterface {
     public async getOneTodo(userId: number, todolistId: number, id: number): Promise<TodoData> {
         try {
             const todo = await this.todoRepo.getTodoByTodoId(userId, todolistId, id);
-            const parsedData = {
-                'id': todo.id,
-                'message': todo.message,
-                'status': todo.status,
-                'updatedAt': todo.updatedAt,
-            }
-            return parsedData;
+            const parsedTodo = filterTodoData(todo);
+
+            return parsedTodo;
         } catch (e) {
             throw e;
         }
     }
 
-    public async createTodo(userId: number, todolistId: number, message: string): Promise<null> {
+    public async createTodo(userId: number, todolistId: number, message: string): Promise<TodoData> {
         try {
 
-            await this.todoRepo.insertTodoByTodolistId(userId, todolistId, message);
-            return null;
+            const newTodo = await this.todoRepo.insertTodoByTodolistId(userId, todolistId, message);
+            const parsedTodo = filterTodoData(newTodo);
+
+            return parsedTodo;
         } catch (e) {
             throw e;
         }
     }
 
-    public async updateTodo(userId: number, todolistId: number, id: number, message: string | undefined, status: boolean | undefined): Promise<null> {
+    public async updateTodo(userId: number, todolistId: number, id: number, message: string | undefined, status: boolean | undefined): Promise<TodoData> {
         try {
-            await this.todoRepo.updateTodoById(userId, todolistId, id, message, status);
-            return null;
+            const todo = await this.todoRepo.updateTodoById(userId, todolistId, id, message, status);
+            const parsedTodo = filterTodoData(todo);
+
+            return parsedTodo;
         } catch (e) {
             throw e;
         }
@@ -71,6 +71,7 @@ export class TodoService implements TodoServiceInterface {
     public async deleteTodo(userId: number, todolistId: number, id: number): Promise<null> {
         try {
             await this.todoRepo.deleteTodoById(userId, todolistId, id);
+            
             return null;
         } catch (e) {
             throw e;

@@ -53,9 +53,9 @@ const handleAddTodolist = async (req: Request, res: Response) => {
     const data = result.data;
     const title = data.title;
     try {
-        await todolistService.createTodolist(userId, title);
+        const todolist = await todolistService.createTodolist(userId, title);
 
-        return res201(res, 'TL');
+        return res201(res, 'TL', todolist);
     } catch (e) {
         if (e instanceof NotFoundError) {
             return res404(res, 'TL');
@@ -76,9 +76,9 @@ const handleUpdateTodolist = async (req: Request, res: Response) => {
     const title = result.data.title;
     const status = result.data.status;
     try {
-        await todolistService.updateTodolist(userId, todolistId, title, status)
+        const todolist = await todolistService.updateTodolist(userId, todolistId, title, status)
 
-        return res201(res, 'TL');
+        return res201(res, 'TL', todolist);
     } catch (e) {
         if (e instanceof NotFoundError) {
             return res404(res, 'TL');
