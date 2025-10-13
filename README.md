@@ -28,8 +28,8 @@ app -> routes -> middlewares -> controllers -> services -> repository -> databas
 
 | Method | Endpoint                               | Controller ID | Auth | Payload                  | Response Example                  | Description                           |
 | ------ | -------------------------------------- | ------------- | ---- | ------------------------ | --------------------------------- | ------------------------------------- |
-| POST   | `/register`                            | RE            | -    | `{ username, password }` | OK                                | Register a new user                   |
-| POST   | `/login`                               | RE            | -    | `{ username, password }` | JWT                               | Login and receive JWT                 |
+| POST   | `/register`                            | RE            | -    | `{ username, password }` | status                            | Register a new user                   |
+| POST   | `/login`                               | RE            | -    | `{ username, password }` | status, data: token               | Login and receive JWT                 |
 | GET    | `/todolists`                           | TL            | JWT  | –                        | status, message, data: todolist[] | Fetch all to-do lists                 |
 | GET    | `/todolists/:todolistId`               | TL            | JWT  | –                        | status, message, data: todolist   | Get a single to-do list and its todos |
 | POST   | `/todolists`                           | TL            | JWT  | `{ title }`              | status, message, data: todolist   | Create a new to-do list               |
