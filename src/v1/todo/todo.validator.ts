@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Todo } from '../../database/models/todo.model';
 
 const addTodoSchema = z.object({
     message: z.string().max(225),
@@ -16,4 +17,13 @@ interface TodoData {
     updatedAt: Date;
 };
 
-export { addTodoSchema, updateTodoSchema, TodoData };
+function filterTodoData(todo: Todo): TodoData {
+    return {
+        'id': todo.id,
+        'message': todo.message,
+        'status': todo.status,
+        'updatedAt': todo.updatedAt,
+    }
+}
+
+export { addTodoSchema, updateTodoSchema, TodoData, filterTodoData };
