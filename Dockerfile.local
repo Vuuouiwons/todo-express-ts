@@ -1,22 +1,23 @@
-FROM node:lts-alpine3.22 AS build_js
+FROM node:24.11.1-alpine3.22 AS build_js
 
 WORKDIR /usr/local/build
 
 COPY . .
 
-RUN npm install
+RUN npm ci
 
 RUN npm run build
 
-FROM node:lts-alpine3.22 AS build_depedency
+FROM node:24.11.1-alpine3.22 AS build_depedency
 
 WORKDIR /usr/local/build
 
-COPY . .
+ADD package.json .
+ADD package-lock.json .
 
-RUN npm install --omit=dev
+RUN npm ci --omit=dev
 
-FROM node:lts-alpine3.22 AS prod
+FROM node:24.11.1-alpine3.22 AS prod
 
 WORKDIR /usr/local
 
