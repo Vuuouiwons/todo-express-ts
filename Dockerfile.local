@@ -21,9 +21,9 @@ FROM node:24.11.1-alpine3.22 AS prod
 
 WORKDIR /usr/local
 
-COPY --from=build_js /usr/local/build/build ./build
+COPY --from=build_js /usr/local/build/build ./dist
 COPY --from=build_depedency /usr/local/build/node_modules ./node_modules
 
 ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
 
-CMD [ "/usr/local/build/main.js" ]
+CMD [ "/usr/local/dist/main.js" ]
